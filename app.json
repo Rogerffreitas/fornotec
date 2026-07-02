@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "forno-app",
+    "slug": "forno-app",
+    "scheme": "fornoapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "plugins": ["expo-router"],
+    "ios": { "supportsTablet": true },
+    "android": {},
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./public/favicon.png"
+    }
+  }
+}
