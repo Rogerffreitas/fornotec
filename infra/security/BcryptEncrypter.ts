@@ -1,5 +1,5 @@
-import bcrypt from "bcryptjs";
-import { Encrypter } from "../../domain/application/infra/Encrypter";
+import bcrypt from 'bcryptjs';
+import { Encrypter } from '../../domain/application/infra/Encrypter';
 
 const SALT_ROUNDS = 8;
 

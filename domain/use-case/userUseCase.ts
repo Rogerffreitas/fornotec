@@ -1,5 +1,5 @@
-import { AuthenticatedUser, NewUser } from "../entities/User";
-import { Role } from "../types";
+import { AuthenticatedUser, NewUser } from '../entities/User';
+import { Role } from '../types';
 
 export interface AuthResult {
   user: AuthenticatedUser;

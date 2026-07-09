@@ -1,4 +1,4 @@
-import { Part, NewPart } from "../../entities/Part";
+import { Part, NewPart } from '../../entities/Part';
 
 export interface PartRepositoryGateway {
   findAll(): Promise<Part[]>;

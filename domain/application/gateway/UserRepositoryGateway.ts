@@ -1,4 +1,4 @@
-import { User, NewUser } from "../../entities/User";
+import { User, NewUser } from '../../entities/User';
 
 export interface UserRepositoryGateway {
   findByUsername(username: string): Promise<User | undefined>;

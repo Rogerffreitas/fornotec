@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useMemo } from "react";
-import { AuthenticatedUser } from "../domain/entities/User";
-import { Role } from "../domain/types";
-import { userUseCase } from "../infra/ioc/container";
+import React, { createContext, useContext, useState, useMemo } from 'react';
+import { AuthenticatedUser } from '../domain/entities/User';
+import { Role } from '../domain/types';
+import { userUseCase } from '../infra/ioc/container';
 
 interface AuthContextValue {
   user: AuthenticatedUser | null;
@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const result = await userUseCase.authenticate(username, password, role);
       if (!result) {
-        setError("Usuário, senha ou perfil inválidos.");
+        setError('Usuário, senha ou perfil inválidos.');
         return false;
       }
       setUser(result.user);
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(
     () => ({ user, token, loading, error, login, logout }),
-    [user, token, loading, error]
+    [user, token, loading, error],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -52,6 +52,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth deve ser usado dentro de um AuthProvider");
+  if (!ctx) throw new Error('useAuth deve ser usado dentro de um AuthProvider');
   return ctx;
 }

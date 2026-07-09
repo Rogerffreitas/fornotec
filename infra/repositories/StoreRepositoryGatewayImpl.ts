@@ -1,7 +1,7 @@
-import { StoreRepositoryGateway } from "../../domain/application/gateway/StoreRepositoryGateway";
-import { Store, NewStore } from "../../domain/entities/Store";
-import { stores } from "./seed";
-import { delay, nextId } from "./utils";
+import { StoreRepositoryGateway } from '../../domain/application/gateway/StoreRepositoryGateway';
+import { Store, NewStore } from '../../domain/entities/Store';
+import { stores } from './seed';
+import { delay, nextId } from './utils';
 
 export class StoreRepositoryGatewayImpl implements StoreRepositoryGateway {
   async findAll(): Promise<Store[]> {

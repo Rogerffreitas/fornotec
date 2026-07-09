@@ -1,6 +1,6 @@
-import React from "react";
-import { View, TextInput, StyleSheet } from "react-native";
-import { colors, spacing, radius } from "./theme";
+import React from 'react';
+import { View, TextInput, StyleSheet } from 'react-native';
+import { colors, spacing, radius } from './theme';
 
 interface Props {
   valor: string;
@@ -8,7 +8,7 @@ interface Props {
   placeholder?: string;
 }
 
-export function FilterInput({ valor, aoMudar, placeholder = "Filtrar..." }: Props) {
+export function FilterInput({ valor, aoMudar, placeholder = 'Filtrar...' }: Props) {
   return (
     <View style={styles.container}>
       <TextInput

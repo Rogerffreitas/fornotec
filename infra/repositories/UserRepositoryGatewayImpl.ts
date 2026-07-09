@@ -1,7 +1,7 @@
-import { UserRepositoryGateway } from "../../domain/application/gateway/UserRepositoryGateway";
-import { User, NewUser } from "../../domain/entities/User";
-import { users } from "./seed";
-import { delay, nextId } from "./utils";
+import { UserRepositoryGateway } from '../../domain/application/gateway/UserRepositoryGateway';
+import { User, NewUser } from '../../domain/entities/User';
+import { users } from './seed';
+import { delay, nextId } from './utils';
 
 export class UserRepositoryGatewayImpl implements UserRepositoryGateway {
   async findByUsername(username: string): Promise<User | undefined> {

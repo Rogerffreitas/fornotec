@@ -1,5 +1,5 @@
-import { Maintenance } from "../../entities/Maintenance";
-import { ServiceType } from "../../types";
+import { Maintenance } from '../../entities/Maintenance';
+import { ServiceType } from '../../types';
 
 export interface CreateMaintenanceInput {
   orderId: number;

@@ -1,4 +1,4 @@
-import { Maintenance, NewMaintenanceItem } from "../entities/Maintenance";
+import { Maintenance, NewMaintenanceItem } from '../entities/Maintenance';
 
 export interface MaintenanceUseCase {
   findAll(): Promise<Maintenance[]>;

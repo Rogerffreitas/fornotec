@@ -1,5 +1,5 @@
-import { WorkOrder, NewWorkOrder, WorkOrderOven, NewWorkOrderOven } from "../../entities/WorkOrder";
-import { WorkOrderStatus } from "../../types";
+import { WorkOrder, NewWorkOrder, WorkOrderOven, NewWorkOrderOven } from '../../entities/WorkOrder';
+import { WorkOrderStatus } from '../../types';
 
 export interface WorkOrderRepositoryGateway {
   findAll(): Promise<WorkOrder[]>;

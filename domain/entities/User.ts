@@ -1,4 +1,4 @@
-import { Role } from "../types";
+import { Role } from '../types';
 
 export interface User {
   id: number;
@@ -18,4 +18,4 @@ export interface NewUser {
 }
 
 /** Dados públicos do usuário autenticado — nunca inclui a senha/hash. */
-export type AuthenticatedUser = Omit<User, "password">;
+export type AuthenticatedUser = Omit<User, 'password'>;

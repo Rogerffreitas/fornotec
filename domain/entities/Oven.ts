@@ -22,12 +22,15 @@ export interface Oven {
   nextMaintenance: string | null;
 }
 
-export type NewOven = Omit<Oven, "id" | "lastMaintenance" | "nextMaintenance">;
+export type NewOven = Omit<Oven, 'id' | 'lastMaintenance' | 'nextMaintenance'>;
 
 export const OVEN_DESCRIPTION_MAX_LENGTH = 100;
 
 /** Regra de negócio: próxima manutenção = última manutenção + periodicidade (dias). */
-export function computeNextMaintenance(lastMaintenanceISO: string, maintenanceFrequencyDays: number): string {
+export function computeNextMaintenance(
+  lastMaintenanceISO: string,
+  maintenanceFrequencyDays: number,
+): string {
   const date = new Date(lastMaintenanceISO);
   date.setDate(date.getDate() + maintenanceFrequencyDays);
   return date.toISOString();

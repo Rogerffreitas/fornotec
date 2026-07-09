@@ -1,4 +1,4 @@
-import { LocationRef } from "../types";
+import { LocationRef } from '../types';
 
 export interface Part {
   id: number;
@@ -9,7 +9,7 @@ export interface Part {
   reference: string;
 }
 
-export type NewPart = Omit<Part, "id" | "reference">;
+export type NewPart = Omit<Part, 'id' | 'reference'>;
 
 export const PART_FIELD_MAX_LENGTH = 100;
 

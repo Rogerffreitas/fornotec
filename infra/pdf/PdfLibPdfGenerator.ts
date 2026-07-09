@@ -1,6 +1,6 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { PdfGenerator } from "../../domain/application/infra/PdfGenerator";
-import { DocumentDefinitions } from "../../domain/application/infra/DocumentDefinitions";
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PdfGenerator } from '../../domain/application/infra/PdfGenerator';
+import { DocumentDefinitions } from '../../domain/application/infra/DocumentDefinitions';
 
 const PAGE_SIZE: [number, number] = [595.28, 841.89]; // A4
 const MARGIN = 50;
@@ -22,7 +22,10 @@ export class PdfLibPdfGenerator implements PdfGenerator {
       }
     };
 
-    const drawLine = (text: string, options: { bold?: boolean; size?: number; color?: [number, number, number] } = {}) => {
+    const drawLine = (
+      text: string,
+      options: { bold?: boolean; size?: number; color?: [number, number, number] } = {},
+    ) => {
       ensureSpace();
       page.drawText(text, {
         x: MARGIN,

@@ -14,6 +14,7 @@ npx expo start           # aperte "w" para abrir no navegador
 ```
 
 Login de teste (mockado):
+
 - Técnico → usuário `admin`, senha `admin`
 - Cliente → usuário `cliente`, senha `cliente`
 
@@ -63,7 +64,7 @@ app/                -> telas, roteadas por pasta (Expo Router)
 
 ### Trocando o mock por uma API de verdade
 
-Cada Interactor só conhece a *interface* do Gateway (porta), nunca a
+Cada Interactor só conhece a _interface_ do Gateway (porta), nunca a
 implementação. Para plugar o back-end real:
 
 1. Crie, por exemplo, `infra/repositories/StoreRepositoryGatewayApi.ts implements StoreRepositoryGateway`,

@@ -1,11 +1,11 @@
-import React from "react";
-import { Pressable, Text, StyleSheet, ActivityIndicator, ViewStyle } from "react-native";
-import { colors, spacing, radius } from "./theme";
+import React from 'react';
+import { Pressable, Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
+import { colors, spacing, radius } from './theme';
 
 interface Props {
   titulo: string;
   onPress: () => void;
-  variante?: "primaria" | "secundaria" | "perigo";
+  variante?: 'primaria' | 'secundaria' | 'perigo';
   carregando?: boolean;
   desabilitado?: boolean;
   style?: ViewStyle;
@@ -14,13 +14,13 @@ interface Props {
 export function PrimaryButton({
   titulo,
   onPress,
-  variante = "primaria",
+  variante = 'primaria',
   carregando,
   desabilitado,
   style,
 }: Props) {
-  const ehPrimaria = variante === "primaria";
-  const ehPerigo = variante === "perigo";
+  const ehPrimaria = variante === 'primaria';
+  const ehPerigo = variante === 'perigo';
   return (
     <Pressable
       onPress={onPress}
@@ -36,9 +36,11 @@ export function PrimaryButton({
       ]}
     >
       {carregando ? (
-        <ActivityIndicator color={ehPrimaria || ehPerigo ? "#FFFFFF" : colors.primary} />
+        <ActivityIndicator color={ehPrimaria || ehPerigo ? '#FFFFFF' : colors.primary} />
       ) : (
-        <Text style={ehPrimaria || ehPerigo ? styles.textoClaro : styles.textoEscuro}>{titulo}</Text>
+        <Text style={ehPrimaria || ehPerigo ? styles.textoClaro : styles.textoEscuro}>
+          {titulo}
+        </Text>
       )}
     </Pressable>
   );
@@ -49,14 +51,14 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.md,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   primaria: { backgroundColor: colors.primary },
   perigo: { backgroundColor: colors.danger },
   secundaria: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
   desabilitado: { opacity: 0.5 },
   pressionado: { opacity: 0.85 },
-  textoClaro: { color: "#FFFFFF", fontWeight: "600", fontSize: 15 },
-  textoEscuro: { color: colors.text, fontWeight: "600", fontSize: 15 },
+  textoClaro: { color: '#FFFFFF', fontWeight: '600', fontSize: 15 },
+  textoEscuro: { color: colors.text, fontWeight: '600', fontSize: 15 },
 });

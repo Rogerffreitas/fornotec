@@ -1,4 +1,4 @@
-import { WorkOrder, NewWorkOrder, WorkOrderOven } from "../entities/WorkOrder";
+import { WorkOrder, NewWorkOrder, WorkOrderOven } from '../entities/WorkOrder';
 
 export interface OvenOfNewOrder {
   ovenId: number;
@@ -10,7 +10,10 @@ export interface WorkOrderUseCase {
   findWithFilter(storeId?: number): Promise<WorkOrder[]>;
   findById(id: number): Promise<WorkOrder | undefined>;
   findOvensOfOrder(orderId: number): Promise<WorkOrderOven[]>;
-  create(data: NewWorkOrder, ovens: OvenOfNewOrder[]): Promise<{ order: WorkOrder; orderOvens: WorkOrderOven[] }>;
+  create(
+    data: NewWorkOrder,
+    ovens: OvenOfNewOrder[],
+  ): Promise<{ order: WorkOrder; orderOvens: WorkOrderOven[] }>;
   finalize(id: number): Promise<WorkOrder>;
   cancel(id: number): Promise<WorkOrder>;
 }

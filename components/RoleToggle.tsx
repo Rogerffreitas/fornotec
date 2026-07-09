@@ -1,8 +1,8 @@
-import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import { colors, spacing, radius } from "./theme";
+import React from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { colors, spacing, radius } from './theme';
 
-export type LoginRole = "technician" | "client";
+export type LoginRole = 'technician' | 'client';
 
 interface Props {
   valor: LoginRole;
@@ -13,7 +13,7 @@ interface Props {
 export function RoleToggle({ valor, aoMudar }: Props) {
   return (
     <View style={styles.container}>
-      {(["technician", "client"] as LoginRole[]).map((papel) => {
+      {(['technician', 'client'] as LoginRole[]).map((papel) => {
         const ativo = valor === papel;
         return (
           <Pressable
@@ -23,7 +23,7 @@ export function RoleToggle({ valor, aoMudar }: Props) {
           >
             <View style={[styles.checkbox, ativo && styles.checkboxMarcado]} />
             <Text style={[styles.texto, ativo && styles.textoAtivo]}>
-              {papel === "technician" ? "Sou técnico" : "Sou cliente"}
+              {papel === 'technician' ? 'Sou técnico' : 'Sou cliente'}
             </Text>
           </Pressable>
         );
@@ -33,11 +33,11 @@ export function RoleToggle({ valor, aoMudar }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flexDirection: "row", gap: spacing.sm, marginBottom: spacing.md },
+  container: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.md },
   opcao: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
     borderWidth: 1,
     borderColor: colors.border,
@@ -48,6 +48,6 @@ const styles = StyleSheet.create({
   opcaoAtiva: { borderColor: colors.primary, backgroundColor: colors.highlight },
   checkbox: { width: 16, height: 16, borderRadius: 4, borderWidth: 2, borderColor: colors.border },
   checkboxMarcado: { backgroundColor: colors.primary, borderColor: colors.primary },
-  texto: { fontSize: 13, color: colors.text, fontWeight: "600" },
+  texto: { fontSize: 13, color: colors.text, fontWeight: '600' },
   textoAtivo: { color: colors.primaryDark },
 });

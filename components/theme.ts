@@ -1,15 +1,15 @@
 export const colors = {
-  background: "#F5F6F8",
-  card: "#FFFFFF",
-  border: "#E2E5EA",
-  text: "#1C1F26",
-  textSecondary: "#6B7280",
-  primary: "#2563EB",
-  primaryDark: "#1D4ED8",
-  danger: "#DC2626",
-  success: "#16A34A",
-  warning: "#D97706",
-  highlight: "#EFF4FF",
+  background: '#F5F6F8',
+  card: '#FFFFFF',
+  border: '#E2E5EA',
+  text: '#1C1F26',
+  textSecondary: '#6B7280',
+  primary: '#2563EB',
+  primaryDark: '#1D4ED8',
+  danger: '#DC2626',
+  success: '#16A34A',
+  warning: '#D97706',
+  highlight: '#EFF4FF',
 };
 
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 };

@@ -1,7 +1,7 @@
-import { OvenUseCase } from "../use-case/ovenUseCase";
-import { OvenRepositoryGateway } from "../application/gateway/OvenRepositoryGateway";
-import { Oven, NewOven, computeNextMaintenance } from "../entities/Oven";
-import { OvenPart } from "../entities/OvenPart";
+import { OvenUseCase } from '../use-case/ovenUseCase';
+import { OvenRepositoryGateway } from '../application/gateway/OvenRepositoryGateway';
+import { Oven, NewOven, computeNextMaintenance } from '../entities/Oven';
+import { OvenPart } from '../entities/OvenPart';
 
 export class OvenInteractor implements OvenUseCase {
   constructor(private readonly gateway: OvenRepositoryGateway) {}
@@ -17,7 +17,7 @@ export class OvenInteractor implements OvenUseCase {
     return all.filter(
       (o) =>
         o.description.toLowerCase().includes(target) ||
-        (o.assetNumber ?? "").toLowerCase().includes(target)
+        (o.assetNumber ?? '').toLowerCase().includes(target),
     );
   }
 

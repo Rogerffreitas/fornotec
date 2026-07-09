@@ -1,6 +1,6 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { colors, spacing } from "./theme";
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { colors, spacing } from './theme';
 
 export function EmptyState({ texto }: { texto: string }) {
   return (
@@ -11,6 +11,6 @@ export function EmptyState({ texto }: { texto: string }) {
 }
 
 const styles = StyleSheet.create({
-  container: { paddingVertical: spacing.xl, alignItems: "center" },
-  texto: { color: colors.textSecondary, fontSize: 14, textAlign: "center" },
+  container: { paddingVertical: spacing.xl, alignItems: 'center' },
+  texto: { color: colors.textSecondary, fontSize: 14, textAlign: 'center' },
 });

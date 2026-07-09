@@ -1,4 +1,4 @@
-import { TokenGenerator } from "../../domain/application/infra/TokenGenerator";
+import { TokenGenerator } from '../../domain/application/infra/TokenGenerator';
 
 /**
  * Gerador de token mockado — apenas para o app funcionar de ponta a ponta
@@ -13,7 +13,7 @@ export class SimpleTokenGenerator implements TokenGenerator {
     const random = Math.random().toString(36).slice(2) + Date.now().toString(36);
     const summary = Object.entries(payload)
       .map(([key, value]) => `${key}:${String(value)}`)
-      .join("|");
+      .join('|');
     return `mock.${random}.${summary}`;
   }
 }

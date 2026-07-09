@@ -1,7 +1,7 @@
-import { PartRepositoryGateway } from "../../domain/application/gateway/PartRepositoryGateway";
-import { Part, NewPart, generatePartReference } from "../../domain/entities/Part";
-import { parts } from "./seed";
-import { delay, nextId } from "./utils";
+import { PartRepositoryGateway } from '../../domain/application/gateway/PartRepositoryGateway';
+import { Part, NewPart, generatePartReference } from '../../domain/entities/Part';
+import { parts } from './seed';
+import { delay, nextId } from './utils';
 
 export class PartRepositoryGatewayImpl implements PartRepositoryGateway {
   async findAll(): Promise<Part[]> {

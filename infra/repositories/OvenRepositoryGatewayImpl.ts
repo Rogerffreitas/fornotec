@@ -1,8 +1,8 @@
-import { OvenRepositoryGateway } from "../../domain/application/gateway/OvenRepositoryGateway";
-import { Oven, NewOven } from "../../domain/entities/Oven";
-import { OvenPart } from "../../domain/entities/OvenPart";
-import { ovens, ovenParts } from "./seed";
-import { delay, nextId } from "./utils";
+import { OvenRepositoryGateway } from '../../domain/application/gateway/OvenRepositoryGateway';
+import { Oven, NewOven } from '../../domain/entities/Oven';
+import { OvenPart } from '../../domain/entities/OvenPart';
+import { ovens, ovenParts } from './seed';
+import { delay, nextId } from './utils';
 
 export class OvenRepositoryGatewayImpl implements OvenRepositoryGateway {
   async findAll(): Promise<Oven[]> {
@@ -23,7 +23,11 @@ export class OvenRepositoryGatewayImpl implements OvenRepositoryGateway {
     return delay(oven);
   }
 
-  async updateMaintenanceDates(id: number, lastMaintenance: string, nextMaintenance: string): Promise<Oven> {
+  async updateMaintenanceDates(
+    id: number,
+    lastMaintenance: string,
+    nextMaintenance: string,
+  ): Promise<Oven> {
     const oven = ovens.find((o) => o.id === id);
     if (!oven) throw new Error(`Forno ${id} não encontrado`);
     oven.lastMaintenance = lastMaintenance;

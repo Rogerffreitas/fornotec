@@ -1,4 +1,4 @@
-import { WorkOrderStatus } from "../types";
+import { WorkOrderStatus } from '../types';
 
 export interface WorkOrder {
   id: number;
@@ -19,4 +19,4 @@ export interface WorkOrderOven {
   observation: string;
 }
 
-export type NewWorkOrderOven = Omit<WorkOrderOven, "id">;
+export type NewWorkOrderOven = Omit<WorkOrderOven, 'id'>;

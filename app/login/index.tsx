@@ -1,22 +1,22 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { router } from "expo-router";
-import { useAuth } from "../../context/AuthContext";
-import { Screen } from "../../components/Screen";
-import { TextField } from "../../components/TextField";
-import { PrimaryButton } from "../../components/PrimaryButton";
-import { RoleToggle, LoginRole } from "../../components/RoleToggle";
-import { colors, spacing } from "../../components/theme";
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
+import { Screen } from '../../components/Screen';
+import { TextField } from '../../components/TextField';
+import { PrimaryButton } from '../../components/PrimaryButton';
+import { RoleToggle, LoginRole } from '../../components/RoleToggle';
+import { colors, spacing } from '../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Login() {
   const { login, loading, error } = useAuth();
-  const [role, setRole] = useState<LoginRole>("technician");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<LoginRole>('technician');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   async function handleEntrar() {
     const ok = await login(username, password, role);
-    if (ok) router.replace("/home");
+    if (ok) router.replace('/');
   }
 
   return (
@@ -28,14 +28,26 @@ export default function Login() {
         <View style={styles.form}>
           <RoleToggle valor={role} aoMudar={setRole} />
 
-          <TextField rotulo="Usuário" value={username} onChangeText={setUsername} autoCapitalize="none" placeholder="admin" />
-          <TextField rotulo="Senha" value={password} onChangeText={setPassword} secureTextEntry placeholder="••••••" />
+          <TextField
+            rotulo="Usuário"
+            value={username}
+            onChangeText={setUsername}
+            autoCapitalize="none"
+            placeholder="admin"
+          />
+          <TextField
+            rotulo="Senha"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            placeholder="••••••"
+          />
 
           {error ? <Text style={styles.erro}>{error}</Text> : null}
           <PrimaryButton titulo="Entrar" onPress={handleEntrar} carregando={loading} />
 
           <Text style={styles.dica}>
-            Dados mockados: técnico → admin / admin{"\n"}cliente → cliente / cliente
+            Dados mockados: técnico → admin / admin{'\n'}cliente → cliente / cliente
           </Text>
         </View>
       </View>
@@ -44,16 +56,16 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  centro: { flex: 1, justifyContent: "center" },
-  titulo: { fontSize: 24, fontWeight: "700", color: colors.text, textAlign: "center" },
+  centro: { flex: 1, justifyContent: 'center' },
+  titulo: { fontSize: 24, fontWeight: '700', color: colors.text, textAlign: 'center' },
   subtitulo: {
     fontSize: 14,
     color: colors.textSecondary,
-    textAlign: "center",
+    textAlign: 'center',
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
   },
   form: { paddingHorizontal: spacing.md },
-  erro: { color: colors.danger, marginBottom: spacing.md, textAlign: "center" },
-  dica: { marginTop: spacing.md, fontSize: 12, color: colors.textSecondary, textAlign: "center" },
+  erro: { color: colors.danger, marginBottom: spacing.md, textAlign: 'center' },
+  dica: { marginTop: spacing.md, fontSize: 12, color: colors.textSecondary, textAlign: 'center' },
 });

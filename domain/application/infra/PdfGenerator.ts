@@ -1,4 +1,4 @@
-import { DocumentDefinitions } from "./DocumentDefinitions";
+import { DocumentDefinitions } from './DocumentDefinitions';
 
 /** Interface de geração de PDF. Implementação: PdfLibPdfGenerator (pdf-lib). */
 export interface PdfGenerator {

@@ -10,6 +10,6 @@ export interface Store {
   contactNumber?: string;
 }
 
-export type NewStore = Omit<Store, "id">;
+export type NewStore = Omit<Store, 'id'>;
 
 export const STORE_FIELD_MAX_LENGTH = 100;

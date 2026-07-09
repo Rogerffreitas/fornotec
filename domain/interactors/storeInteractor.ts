@@ -1,6 +1,6 @@
-import { StoreUseCase } from "../use-case/storeUseCase";
-import { StoreRepositoryGateway } from "../application/gateway/StoreRepositoryGateway";
-import { Store, NewStore } from "../entities/Store";
+import { StoreUseCase } from '../use-case/storeUseCase';
+import { StoreRepositoryGateway } from '../application/gateway/StoreRepositoryGateway';
+import { Store, NewStore } from '../entities/Store';
 
 export class StoreInteractor implements StoreUseCase {
   constructor(private readonly gateway: StoreRepositoryGateway) {}

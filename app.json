@@ -6,13 +6,15 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "plugins": ["expo-router"],
-    "ios": { "supportsTablet": true },
+    "plugins": ["expo-router", "expo-asset", "expo-font"],
+    "ios": {
+      "supportsTablet": true
+    },
     "android": {},
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./public/favicon.png"
+      "favicon": "./assets/images/favicon.png"
     }
   }
 }

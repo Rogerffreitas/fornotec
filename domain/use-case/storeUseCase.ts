@@ -1,4 +1,4 @@
-import { Store, NewStore } from "../entities/Store";
+import { Store, NewStore } from '../entities/Store';
 
 export interface StoreUseCase {
   findAll(): Promise<Store[]>;

@@ -1,4 +1,4 @@
-import { ServiceType } from "../types";
+import { ServiceType } from '../types';
 
 /**
  * Um registro por peça atendida. Ao selecionar N peças no formulário de

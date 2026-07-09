@@ -1,6 +1,6 @@
-import { PartUseCase } from "../use-case/partUseCase";
-import { PartRepositoryGateway } from "../application/gateway/PartRepositoryGateway";
-import { Part, NewPart } from "../entities/Part";
+import { PartUseCase } from '../use-case/partUseCase';
+import { PartRepositoryGateway } from '../application/gateway/PartRepositoryGateway';
+import { Part, NewPart } from '../entities/Part';
 
 export class PartInteractor implements PartUseCase {
   constructor(private readonly gateway: PartRepositoryGateway) {}
@@ -14,7 +14,8 @@ export class PartInteractor implements PartUseCase {
     if (!filter?.trim()) return all;
     const target = filter.trim().toLowerCase();
     return all.filter(
-      (p) => p.description.toLowerCase().includes(target) || p.reference.toLowerCase().includes(target)
+      (p) =>
+        p.description.toLowerCase().includes(target) || p.reference.toLowerCase().includes(target),
     );
   }
 

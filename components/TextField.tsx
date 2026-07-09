@@ -1,6 +1,6 @@
-import React from "react";
-import { View, Text, TextInput, StyleSheet, TextInputProps } from "react-native";
-import { colors, spacing, radius } from "./theme";
+import React from 'react';
+import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
+import { colors, spacing, radius } from './theme';
 
 interface Props extends TextInputProps {
   rotulo: string;
@@ -23,7 +23,12 @@ export function TextField({ rotulo, erro, style, ...rest }: Props) {
 
 const styles = StyleSheet.create({
   container: { marginBottom: spacing.md },
-  rotulo: { fontSize: 13, fontWeight: "600", color: colors.textSecondary, marginBottom: spacing.xs },
+  rotulo: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
+  },
   input: {
     borderWidth: 1,
     borderColor: colors.border,

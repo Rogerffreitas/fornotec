@@ -1,8 +1,13 @@
-import { WorkOrderRepositoryGateway } from "../../domain/application/gateway/WorkOrderRepositoryGateway";
-import { WorkOrder, NewWorkOrder, WorkOrderOven, NewWorkOrderOven } from "../../domain/entities/WorkOrder";
-import { WorkOrderStatus } from "../../domain/types";
-import { workOrders, workOrderOvens } from "./seed";
-import { delay, nextId } from "./utils";
+import { WorkOrderRepositoryGateway } from '../../domain/application/gateway/WorkOrderRepositoryGateway';
+import {
+  WorkOrder,
+  NewWorkOrder,
+  WorkOrderOven,
+  NewWorkOrderOven,
+} from '../../domain/entities/WorkOrder';
+import { WorkOrderStatus } from '../../domain/types';
+import { workOrders, workOrderOvens } from './seed';
+import { delay, nextId } from './utils';
 
 export class WorkOrderRepositoryGatewayImpl implements WorkOrderRepositoryGateway {
   async findAll(): Promise<WorkOrder[]> {
@@ -18,7 +23,7 @@ export class WorkOrderRepositoryGatewayImpl implements WorkOrderRepositoryGatewa
       id: nextId(workOrders),
       storeId: data.storeId,
       createdAt: new Date().toISOString(),
-      status: "pendente",
+      status: 'pendente',
     };
     workOrders.push(order);
     return delay(order);

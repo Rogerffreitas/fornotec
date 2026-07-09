@@ -1,5 +1,5 @@
-import { Oven, NewOven } from "../entities/Oven";
-import { OvenPart } from "../entities/OvenPart";
+import { Oven, NewOven } from '../entities/Oven';
+import { OvenPart } from '../entities/OvenPart';
 
 export interface OvenUseCase {
   findAll(): Promise<Oven[]>;
