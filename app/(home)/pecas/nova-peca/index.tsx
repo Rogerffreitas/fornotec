@@ -8,8 +8,10 @@ import { LOCATIONS, LocationRef } from '../../../../domain/types';
 import { partUseCase } from '../../../../infra/ioc/container';
 import { PART_FIELD_MAX_LENGTH } from '../../../../domain/entities/Part';
 import { colors, spacing, radius } from '../../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 export default function NovaPeca() {
+  const { user } = useAuth();
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState<LocationRef | null>(null);
   const [salvando, setSalvando] = useState(false);
@@ -23,7 +25,7 @@ export default function NovaPeca() {
     setErro(null);
     setSalvando(true);
     try {
-      await partUseCase.create({ description: description.trim(), location });
+      await partUseCase.create(user!.enterpriseId, { description: description.trim(), location });
       router.back();
     } finally {
       setSalvando(false);

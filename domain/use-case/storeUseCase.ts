@@ -1,8 +1,8 @@
 import { Store, NewStore } from '../entities/Store';
 
 export interface StoreUseCase {
-  findAll(): Promise<Store[]>;
-  findWithFilter(filter: string): Promise<Store[]>;
-  findById(id: number): Promise<Store | undefined>;
-  create(data: NewStore): Promise<Store>;
+  findAll(enterpriseId: string): Promise<Store[]>;
+  findWithFilter(enterpriseId: string, filter: string): Promise<Store[]>;
+  findById(enterpriseId: string, id: number): Promise<Store | undefined>;
+  create(enterpriseId: string, data: NewStore): Promise<Store>;
 }

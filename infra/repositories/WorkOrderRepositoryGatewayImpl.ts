@@ -10,17 +10,18 @@ import { workOrders, workOrderOvens } from './seed';
 import { delay, nextId } from './utils';
 
 export class WorkOrderRepositoryGatewayImpl implements WorkOrderRepositoryGateway {
-  async findAll(): Promise<WorkOrder[]> {
-    return delay([...workOrders]);
+  async findAll(enterpriseId: string): Promise<WorkOrder[]> {
+    return delay(workOrders.filter((o) => o.enterpriseId === enterpriseId));
   }
 
-  async findById(id: number): Promise<WorkOrder | undefined> {
-    return delay(workOrders.find((o) => o.id === id));
+  async findById(enterpriseId: string, id: number): Promise<WorkOrder | undefined> {
+    return delay(workOrders.find((o) => o.id === id && o.enterpriseId === enterpriseId));
   }
 
-  async create(data: NewWorkOrder): Promise<WorkOrder> {
+  async create(enterpriseId: string, data: NewWorkOrder): Promise<WorkOrder> {
     const order: WorkOrder = {
       id: nextId(workOrders),
+      enterpriseId,
       storeId: data.storeId,
       createdAt: new Date().toISOString(),
       status: 'pendente',
@@ -29,20 +30,33 @@ export class WorkOrderRepositoryGatewayImpl implements WorkOrderRepositoryGatewa
     return delay(order);
   }
 
-  async updateStatus(id: number, status: WorkOrderStatus): Promise<WorkOrder> {
-    const order = workOrders.find((o) => o.id === id);
+  async updateStatus(
+    enterpriseId: string,
+    id: number,
+    status: WorkOrderStatus,
+  ): Promise<WorkOrder> {
+    const order = workOrders.find((o) => o.id === id && o.enterpriseId === enterpriseId);
     if (!order) throw new Error(`Ordem ${id} não encontrada`);
     order.status = status;
     return delay(order);
   }
 
-  async findOvensByOrder(orderId: number): Promise<WorkOrderOven[]> {
-    return delay(workOrderOvens.filter((oo) => oo.orderId === orderId));
+  async findOvensByOrder(enterpriseId: string, orderId: number): Promise<WorkOrderOven[]> {
+    return delay(
+      workOrderOvens.filter((oo) => oo.enterpriseId === enterpriseId && oo.orderId === orderId),
+    );
   }
 
-  async createOvens(data: NewWorkOrderOven[]): Promise<WorkOrderOven[]> {
+  async createOvens(
+    enterpriseId: string,
+    data: NewWorkOrderOven[],
+  ): Promise<WorkOrderOven[]> {
     let cursor = nextId(workOrderOvens);
-    const created: WorkOrderOven[] = data.map((item) => ({ id: cursor++, ...item }));
+    const created: WorkOrderOven[] = data.map((item) => ({
+      id: cursor++,
+      enterpriseId,
+      ...item,
+    }));
     workOrderOvens.push(...created);
     return delay(created);
   }

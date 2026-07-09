@@ -9,8 +9,10 @@ import { EmptyState } from '../../../components/EmptyState';
 import { Oven } from '../../../domain/entities/Oven';
 import { Store } from '../../../domain/entities/Store';
 import { ovenUseCase, storeUseCase } from '../../../infra/ioc/container';
+import { useAuth } from '@/context/AuthContext';
 
 export default function PecasForno() {
+  const { user } = useAuth();
   const [fornos, setFornos] = useState<Oven[]>([]);
   const [lojasPorId, setLojasPorId] = useState<Record<number, Store>>({});
   const [filtro, setFiltro] = useState('');
@@ -19,13 +21,13 @@ export default function PecasForno() {
   const carregar = useCallback(async () => {
     setCarregando(true);
     const [listaFornos, listaLojas] = await Promise.all([
-      ovenUseCase.findAll(),
-      storeUseCase.findAll(),
+      ovenUseCase.findAll(user!.enterpriseId),
+      storeUseCase.findAll(user!.enterpriseId),
     ]);
     setFornos(listaFornos);
     setLojasPorId(Object.fromEntries(listaLojas.map((l) => [l.id, l])));
     setCarregando(false);
-  }, []);
+  }, [user]);
 
   useFocusEffect(
     useCallback(() => {

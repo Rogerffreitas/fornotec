@@ -5,43 +5,55 @@ import { ovens, ovenParts } from './seed';
 import { delay, nextId } from './utils';
 
 export class OvenRepositoryGatewayImpl implements OvenRepositoryGateway {
-  async findAll(): Promise<Oven[]> {
-    return delay([...ovens]);
+  async findAll(enterpriseId: string): Promise<Oven[]> {
+    return delay(ovens.filter((o) => o.enterpriseId === enterpriseId));
   }
 
-  async findByStore(storeId: number): Promise<Oven[]> {
-    return delay(ovens.filter((o) => o.storeId === storeId));
+  async findByStore(enterpriseId: string, storeId: number): Promise<Oven[]> {
+    return delay(ovens.filter((o) => o.enterpriseId === enterpriseId && o.storeId === storeId));
   }
 
-  async findById(id: number): Promise<Oven | undefined> {
-    return delay(ovens.find((o) => o.id === id));
+  async findById(enterpriseId: string, id: number): Promise<Oven | undefined> {
+    return delay(ovens.find((o) => o.id === id && o.enterpriseId === enterpriseId));
   }
 
-  async create(data: NewOven): Promise<Oven> {
-    const oven: Oven = { id: nextId(ovens), ...data, lastMaintenance: null, nextMaintenance: null };
+  async create(enterpriseId: string, data: NewOven): Promise<Oven> {
+    const oven: Oven = {
+      id: nextId(ovens),
+      enterpriseId,
+      ...data,
+      lastMaintenance: null,
+      nextMaintenance: null,
+    };
     ovens.push(oven);
     return delay(oven);
   }
 
   async updateMaintenanceDates(
+    enterpriseId: string,
     id: number,
     lastMaintenance: string,
     nextMaintenance: string,
   ): Promise<Oven> {
-    const oven = ovens.find((o) => o.id === id);
+    const oven = ovens.find((o) => o.id === id && o.enterpriseId === enterpriseId);
     if (!oven) throw new Error(`Forno ${id} não encontrado`);
     oven.lastMaintenance = lastMaintenance;
     oven.nextMaintenance = nextMaintenance;
     return delay(oven);
   }
 
-  async findPartsByOven(ovenId: number): Promise<OvenPart[]> {
-    return delay(ovenParts.filter((op) => op.ovenId === ovenId));
+  async findPartsByOven(enterpriseId: string, ovenId: number): Promise<OvenPart[]> {
+    return delay(ovenParts.filter((op) => op.enterpriseId === enterpriseId && op.ovenId === ovenId));
   }
 
-  async addParts(ovenId: number, partIds: number[]): Promise<OvenPart[]> {
+  async addParts(enterpriseId: string, ovenId: number, partIds: number[]): Promise<OvenPart[]> {
     let cursor = nextId(ovenParts);
-    const created: OvenPart[] = partIds.map((partId) => ({ id: cursor++, ovenId, partId }));
+    const created: OvenPart[] = partIds.map((partId) => ({
+      id: cursor++,
+      enterpriseId,
+      ovenId,
+      partId,
+    }));
     ovenParts.push(...created);
     return delay(created);
   }

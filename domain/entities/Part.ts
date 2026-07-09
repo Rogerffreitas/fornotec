@@ -2,6 +2,7 @@ import { LocationRef } from '../types';
 
 export interface Part {
   id: number;
+  enterpriseId: string;
   /** Obrigatório, máx. 100 caracteres. */
   description: string;
   location: LocationRef;
@@ -9,7 +10,7 @@ export interface Part {
   reference: string;
 }
 
-export type NewPart = Omit<Part, 'id' | 'reference'>;
+export type NewPart = Omit<Part, 'id' | 'enterpriseId' | 'reference'>;
 
 export const PART_FIELD_MAX_LENGTH = 100;
 

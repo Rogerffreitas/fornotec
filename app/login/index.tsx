@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { Screen } from '../../components/Screen';
 import { TextField } from '../../components/TextField';
 import { PrimaryButton } from '../../components/PrimaryButton';
-import { RoleToggle, LoginRole } from '../../components/RoleToggle';
+import { RoleToggle, LoginRole, LOGIN_ROLE_TO_ROLE } from '../../components/RoleToggle';
 import { colors, spacing } from '../../components/theme';
 import { useAuth } from '@/context/AuthContext';
 
@@ -15,7 +15,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
 
   async function handleEntrar() {
-    const ok = await login(username, password, role);
+    const ok = await login(username, password, LOGIN_ROLE_TO_ROLE[role]);
     if (ok) router.replace('/');
   }
 
@@ -45,10 +45,6 @@ export default function Login() {
 
           {error ? <Text style={styles.erro}>{error}</Text> : null}
           <PrimaryButton titulo="Entrar" onPress={handleEntrar} carregando={loading} />
-
-          <Text style={styles.dica}>
-            Dados mockados: técnico → admin / admin{'\n'}cliente → cliente / cliente
-          </Text>
         </View>
       </View>
     </Screen>
@@ -67,5 +63,4 @@ const styles = StyleSheet.create({
   },
   form: { paddingHorizontal: spacing.md },
   erro: { color: colors.danger, marginBottom: spacing.md, textAlign: 'center' },
-  dica: { marginTop: spacing.md, fontSize: 12, color: colors.textSecondary, textAlign: 'center' },
 });

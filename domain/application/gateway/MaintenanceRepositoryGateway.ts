@@ -10,7 +10,7 @@ export interface CreateMaintenanceInput {
 }
 
 export interface MaintenanceRepositoryGateway {
-  findAll(): Promise<Maintenance[]>;
-  findByOrderAndOven(orderId: number, ovenId: number): Promise<Maintenance[]>;
-  createMany(data: CreateMaintenanceInput[]): Promise<Maintenance[]>;
+  findAll(enterpriseId: string): Promise<Maintenance[]>;
+  findByOrderAndOven(enterpriseId: string, orderId: number, ovenId: number): Promise<Maintenance[]>;
+  createMany(enterpriseId: string, data: CreateMaintenanceInput[]): Promise<Maintenance[]>;
 }

@@ -18,12 +18,14 @@ import {
   maintenanceUseCase,
 } from '../../../../infra/ioc/container';
 import { colors, spacing, radius } from '../../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR');
 }
 
 export default function NovaManutencao() {
+  const { user } = useAuth();
   const [ordens, setOrdens] = useState<WorkOrder[]>([]);
   const [lojasPorId, setLojasPorId] = useState<Record<number, Store>>({});
   const [orderId, setOrderId] = useState<number | null>(null);
@@ -41,12 +43,14 @@ export default function NovaManutencao() {
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([workOrderUseCase.findAll(), storeUseCase.findAll()]).then(
-      ([listaOrdens, lojas]) => {
-        setOrdens(listaOrdens);
-        setLojasPorId(Object.fromEntries(lojas.map((l) => [l.id, l])));
-      },
-    );
+    Promise.all([
+      workOrderUseCase.findAll(user!.enterpriseId),
+      storeUseCase.findAll(user!.enterpriseId),
+    ]).then(([listaOrdens, lojas]) => {
+      setOrdens(listaOrdens);
+      setLojasPorId(Object.fromEntries(lojas.map((l) => [l.id, l])));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -54,11 +58,14 @@ export default function NovaManutencao() {
       setFornosDaOrdem([]);
       return;
     }
-    workOrderUseCase.findOvensOfOrder(orderId).then(async (orderOvens) => {
-      const fornos = await Promise.all(orderOvens.map((oo) => ovenUseCase.findById(oo.ovenId)));
+    workOrderUseCase.findOvensOfOrder(user!.enterpriseId, orderId).then(async (orderOvens) => {
+      const fornos = await Promise.all(
+        orderOvens.map((oo) => ovenUseCase.findById(user!.enterpriseId, oo.ovenId)),
+      );
       setFornosDaOrdem(fornos.filter((f): f is Oven => !!f));
     });
     setOvenId(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId]);
 
   useEffect(() => {
@@ -66,10 +73,16 @@ export default function NovaManutencao() {
       setPecasDoForno([]);
       return;
     }
-    ovenUseCase.findPartsOfOven(ovenId).then(async (associacoes) => {
-      setPecasDoForno(await partUseCase.findByIds(associacoes.map((a) => a.partId)));
+    ovenUseCase.findPartsOfOven(user!.enterpriseId, ovenId).then(async (associacoes) => {
+      setPecasDoForno(
+        await partUseCase.findByIds(
+          user!.enterpriseId,
+          associacoes.map((a) => a.partId),
+        ),
+      );
     });
     setPartId(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ovenId]);
 
   async function salvar() {
@@ -80,7 +93,7 @@ export default function NovaManutencao() {
     setErro(null);
     setSalvando(true);
     try {
-      await maintenanceUseCase.register(orderId, ovenId, [
+      await maintenanceUseCase.register(user!.enterpriseId, orderId, ovenId, [
         { partId, serviceType: servico, observation: observacao },
       ]);
       router.back();

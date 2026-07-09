@@ -10,6 +10,7 @@ import { WorkOrder } from '../../../domain/entities/WorkOrder';
 import { Store } from '../../../domain/entities/Store';
 import { workOrderUseCase, storeUseCase } from '../../../infra/ioc/container';
 import { colors, spacing, radius } from '../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR');
@@ -22,20 +23,25 @@ function badgeDoStatus(status: WorkOrder['status']) {
 }
 
 export default function OrdensDeServico() {
+  const { user } = useAuth();
   const [lojas, setLojas] = useState<Store[]>([]);
   const [lojaFiltro, setLojaFiltro] = useState<number | null>(null);
   const [ordens, setOrdens] = useState<WorkOrder[]>([]);
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
-    storeUseCase.findAll().then(setLojas);
+    storeUseCase.findAll(user!.enterpriseId).then(setLojas);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const carregar = useCallback(async (storeId: number | null) => {
-    setCarregando(true);
-    setOrdens(await workOrderUseCase.findWithFilter(storeId ?? undefined));
-    setCarregando(false);
-  }, []);
+  const carregar = useCallback(
+    async (storeId: number | null) => {
+      setCarregando(true);
+      setOrdens(await workOrderUseCase.findWithFilter(user!.enterpriseId, storeId ?? undefined));
+      setCarregando(false);
+    },
+    [user],
+  );
 
   useFocusEffect(
     useCallback(() => {

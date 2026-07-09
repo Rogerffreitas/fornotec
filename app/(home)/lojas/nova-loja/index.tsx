@@ -7,8 +7,10 @@ import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { storeUseCase } from '../../../../infra/ioc/container';
 import { STORE_FIELD_MAX_LENGTH } from '../../../../domain/entities/Store';
 import { colors, spacing } from '../../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 export default function NovaLoja() {
+  const { user } = useAuth();
   const [description, setDescription] = useState('');
   const [address, setAddress] = useState('');
   const [contactName, setContactName] = useState('');
@@ -26,7 +28,7 @@ export default function NovaLoja() {
     setErro(null);
     setSalvando(true);
     try {
-      await storeUseCase.create({
+      await storeUseCase.create(user!.enterpriseId, {
         description: description.trim(),
         address: address.trim(),
         contactName: contactName.trim() || undefined,

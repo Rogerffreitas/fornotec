@@ -10,17 +10,22 @@ import { PrimaryButton } from '../../../components/PrimaryButton';
 import { Store } from '../../../domain/entities/Store';
 import { storeUseCase } from '../../../infra/ioc/container';
 import { spacing } from '../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Lojas() {
+  const { user } = useAuth();
   const [lojas, setLojas] = useState<Store[]>([]);
   const [filtro, setFiltro] = useState('');
   const [carregando, setCarregando] = useState(true);
 
-  const carregar = useCallback(async (texto: string) => {
-    setCarregando(true);
-    setLojas(await storeUseCase.findWithFilter(texto));
-    setCarregando(false);
-  }, []);
+  const carregar = useCallback(
+    async (texto: string) => {
+      setCarregando(true);
+      setLojas(await storeUseCase.findWithFilter(user!.enterpriseId, texto));
+      setCarregando(false);
+    },
+    [user],
+  );
 
   useFocusEffect(
     useCallback(() => {

@@ -1,5 +1,12 @@
-import axios, { AxiosInstance } from 'axios';
-import { HttpClient, HttpRequestConfig } from '../application/infra/HttpClient';
+import axios, { AxiosInstance, isAxiosError } from 'axios';
+import { HttpClient, HttpRequestConfig, HttpError } from '../application/infra/HttpClient';
+
+function toHttpError(error: unknown, url: string): unknown {
+  if (isAxiosError(error) && error.response) {
+    return new HttpError(error.response.status, url);
+  }
+  return error;
+}
 
 /** Implementação de HttpClient usando axios. Alternativa ao FetchHttpClientAdapter. */
 export class AxiosHttpClientAdapter implements HttpClient {
@@ -10,34 +17,50 @@ export class AxiosHttpClientAdapter implements HttpClient {
   }
 
   async get<T>(url: string, config?: HttpRequestConfig): Promise<T> {
-    const { data } = await this.client.get<T>(url, {
-      headers: config?.headers,
-      params: config?.params,
-    });
-    return data;
+    try {
+      const { data } = await this.client.get<T>(url, {
+        headers: config?.headers,
+        params: config?.params,
+      });
+      return data;
+    } catch (error) {
+      throw toHttpError(error, url);
+    }
   }
 
   async post<T>(url: string, body: unknown, config?: HttpRequestConfig): Promise<T> {
-    const { data } = await this.client.post<T>(url, body, {
-      headers: config?.headers,
-      params: config?.params,
-    });
-    return data;
+    try {
+      const { data } = await this.client.post<T>(url, body, {
+        headers: config?.headers,
+        params: config?.params,
+      });
+      return data;
+    } catch (error) {
+      throw toHttpError(error, url);
+    }
   }
 
   async put<T>(url: string, body: unknown, config?: HttpRequestConfig): Promise<T> {
-    const { data } = await this.client.put<T>(url, body, {
-      headers: config?.headers,
-      params: config?.params,
-    });
-    return data;
+    try {
+      const { data } = await this.client.put<T>(url, body, {
+        headers: config?.headers,
+        params: config?.params,
+      });
+      return data;
+    } catch (error) {
+      throw toHttpError(error, url);
+    }
   }
 
   async delete<T>(url: string, config?: HttpRequestConfig): Promise<T> {
-    const { data } = await this.client.delete<T>(url, {
-      headers: config?.headers,
-      params: config?.params,
-    });
-    return data;
+    try {
+      const { data } = await this.client.delete<T>(url, {
+        headers: config?.headers,
+        params: config?.params,
+      });
+      return data;
+    } catch (error) {
+      throw toHttpError(error, url);
+    }
   }
 }

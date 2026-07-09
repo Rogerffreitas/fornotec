@@ -17,6 +17,7 @@ import {
   pdfGenerator,
 } from '../../../../infra/ioc/container';
 import { colors, spacing } from '../../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR');
@@ -37,6 +38,7 @@ async function baixarPdfNaWeb(bytes: Uint8Array, nomeArquivo: string) {
 }
 
 export default function DetalheOrdem() {
+  const { user } = useAuth();
   const { ordemId } = useLocalSearchParams<{ ordemId: string }>();
   const id = Number(ordemId);
 
@@ -48,19 +50,20 @@ export default function DetalheOrdem() {
   const [gerandoPdf, setGerandoPdf] = useState(false);
 
   const carregar = useCallback(async () => {
-    const ordemAtual = await workOrderUseCase.findById(id);
+    const enterpriseId = user!.enterpriseId;
+    const ordemAtual = await workOrderUseCase.findById(enterpriseId, id);
     setOrdem(ordemAtual ?? null);
-    if (ordemAtual) setLoja((await storeUseCase.findById(ordemAtual.storeId)) ?? null);
+    if (ordemAtual) setLoja((await storeUseCase.findById(enterpriseId, ordemAtual.storeId)) ?? null);
 
-    const orderOvens = await workOrderUseCase.findOvensOfOrder(id);
+    const orderOvens = await workOrderUseCase.findOvensOfOrder(enterpriseId, id);
     const comFornos = await Promise.all(
       orderOvens.map(async (oo) => ({
         orderOven: oo,
-        oven: (await ovenUseCase.findById(oo.ovenId))!,
+        oven: (await ovenUseCase.findById(enterpriseId, oo.ovenId))!,
       })),
     );
     setItens(comFornos.filter((i) => i.oven));
-  }, [id]);
+  }, [id, user]);
 
   useFocusEffect(
     useCallback(() => {
@@ -71,7 +74,7 @@ export default function DetalheOrdem() {
   async function finalizar() {
     setFinalizando(true);
     try {
-      await workOrderUseCase.finalize(id);
+      await workOrderUseCase.finalize(user!.enterpriseId, id);
       await carregar();
     } finally {
       setFinalizando(false);
@@ -81,7 +84,7 @@ export default function DetalheOrdem() {
   async function cancelar() {
     setCancelando(true);
     try {
-      await workOrderUseCase.cancel(id);
+      await workOrderUseCase.cancel(user!.enterpriseId, id);
       await carregar();
     } finally {
       setCancelando(false);

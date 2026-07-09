@@ -1,8 +1,15 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { colors, spacing, radius } from './theme';
+import { Role } from '../domain/types';
 
 export type LoginRole = 'technician' | 'client';
+
+/** A API espera o Role em maiúsculas; a UI continua exibindo em português/minúsculo. */
+export const LOGIN_ROLE_TO_ROLE: Record<LoginRole, Role> = {
+  technician: 'TECHNICAL',
+  client: 'CLIENT',
+};
 
 interface Props {
   valor: LoginRole;

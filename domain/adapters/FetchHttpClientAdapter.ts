@@ -1,4 +1,4 @@
-import { HttpClient, HttpRequestConfig } from '../application/infra/HttpClient';
+import { HttpClient, HttpRequestConfig, HttpError } from '../application/infra/HttpClient';
 
 function withQuery(url: string, params?: HttpRequestConfig['params']): string {
   if (!params) return url;
@@ -24,7 +24,7 @@ export class FetchHttpClientAdapter implements HttpClient {
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
     if (!response.ok) {
-      throw new Error(`Erro HTTP ${response.status} ao chamar ${url}`);
+      throw new HttpError(response.status, url);
     }
     return (await response.json()) as T;
   }

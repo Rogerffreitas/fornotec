@@ -12,12 +12,14 @@ import { Part } from '../../../domain/entities/Part';
 import { Oven } from '../../../domain/entities/Oven';
 import { maintenanceUseCase, partUseCase, ovenUseCase } from '../../../infra/ioc/container';
 import { spacing } from '../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR');
 }
 
 export default function Manutencoes() {
+  const { user } = useAuth();
   const [manutencoes, setManutencoes] = useState<Maintenance[]>([]);
   const [pecasPorId, setPecasPorId] = useState<Record<number, Part>>({});
   const [fornosPorId, setFornosPorId] = useState<Record<number, Oven>>({});
@@ -26,16 +28,17 @@ export default function Manutencoes() {
 
   const carregar = useCallback(async () => {
     setCarregando(true);
+    const enterpriseId = user!.enterpriseId;
     const [lista, pecas, fornos] = await Promise.all([
-      maintenanceUseCase.findAll(),
-      partUseCase.findAll(),
-      ovenUseCase.findAll(),
+      maintenanceUseCase.findAll(enterpriseId),
+      partUseCase.findAll(enterpriseId),
+      ovenUseCase.findAll(enterpriseId),
     ]);
     setManutencoes(lista);
     setPecasPorId(Object.fromEntries(pecas.map((p) => [p.id, p])));
     setFornosPorId(Object.fromEntries(fornos.map((f) => [f.id, f])));
     setCarregando(false);
-  }, []);
+  }, [user]);
 
   useFocusEffect(
     useCallback(() => {

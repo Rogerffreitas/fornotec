@@ -1,5 +1,6 @@
 export interface Oven {
   id: number;
+  enterpriseId: string;
   /** Obrigatório. */
   storeId: number;
   /** Opcional — número da etiqueta de patrimônio. */
@@ -22,7 +23,7 @@ export interface Oven {
   nextMaintenance: string | null;
 }
 
-export type NewOven = Omit<Oven, 'id' | 'lastMaintenance' | 'nextMaintenance'>;
+export type NewOven = Omit<Oven, 'id' | 'enterpriseId' | 'lastMaintenance' | 'nextMaintenance'>;
 
 export const OVEN_DESCRIPTION_MAX_LENGTH = 100;
 

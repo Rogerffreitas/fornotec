@@ -9,6 +9,7 @@ import { Store } from '../../../../domain/entities/Store';
 import { Oven } from '../../../../domain/entities/Oven';
 import { storeUseCase, ovenUseCase, workOrderUseCase } from '../../../../infra/ioc/container';
 import { colors, spacing, radius } from '../../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 interface SelecaoForno {
   selecionado: boolean;
@@ -16,6 +17,7 @@ interface SelecaoForno {
 }
 
 export default function NovaOrdem() {
+  const { user } = useAuth();
   const [lojas, setLojas] = useState<Store[]>([]);
   const [storeId, setStoreId] = useState<number | null>(null);
   const [fornos, setFornos] = useState<Oven[]>([]);
@@ -24,18 +26,20 @@ export default function NovaOrdem() {
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    storeUseCase.findAll().then((resultado) => {
+    storeUseCase.findAll(user!.enterpriseId).then((resultado) => {
       setLojas(resultado);
       setStoreId(resultado[0]?.id ?? null);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (!storeId) return;
-    ovenUseCase.findByStore(storeId).then((resultado) => {
+    ovenUseCase.findByStore(user!.enterpriseId, storeId).then((resultado) => {
       setFornos(resultado);
       setSelecoes({});
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeId]);
 
   function alternarForno(ovenId: number) {
@@ -64,7 +68,11 @@ export default function NovaOrdem() {
     setErro(null);
     setSalvando(true);
     try {
-      const { order } = await workOrderUseCase.create({ storeId }, fornosSelecionados);
+      const { order } = await workOrderUseCase.create(
+        user!.enterpriseId,
+        { storeId },
+        fornosSelecionados,
+      );
       router.replace(`/ordem-de-servico/${order.id}`);
     } finally {
       setSalvando(false);

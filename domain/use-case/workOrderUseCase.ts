@@ -6,14 +6,15 @@ export interface OvenOfNewOrder {
 }
 
 export interface WorkOrderUseCase {
-  findAll(): Promise<WorkOrder[]>;
-  findWithFilter(storeId?: number): Promise<WorkOrder[]>;
-  findById(id: number): Promise<WorkOrder | undefined>;
-  findOvensOfOrder(orderId: number): Promise<WorkOrderOven[]>;
+  findAll(enterpriseId: string): Promise<WorkOrder[]>;
+  findWithFilter(enterpriseId: string, storeId?: number): Promise<WorkOrder[]>;
+  findById(enterpriseId: string, id: number): Promise<WorkOrder | undefined>;
+  findOvensOfOrder(enterpriseId: string, orderId: number): Promise<WorkOrderOven[]>;
   create(
+    enterpriseId: string,
     data: NewWorkOrder,
     ovens: OvenOfNewOrder[],
   ): Promise<{ order: WorkOrder; orderOvens: WorkOrderOven[] }>;
-  finalize(id: number): Promise<WorkOrder>;
-  cancel(id: number): Promise<WorkOrder>;
+  finalize(enterpriseId: string, id: number): Promise<WorkOrder>;
+  cancel(enterpriseId: string, id: number): Promise<WorkOrder>;
 }

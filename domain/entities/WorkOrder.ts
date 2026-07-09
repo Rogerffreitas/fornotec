@@ -2,6 +2,7 @@ import { WorkOrderStatus } from '../types';
 
 export interface WorkOrder {
   id: number;
+  enterpriseId: string;
   storeId: number;
   createdAt: string;
   status: WorkOrderStatus;
@@ -14,9 +15,10 @@ export type NewWorkOrder = {
 /** Um forno atendido pela ordem, com sua observação — ex: "forno 1 está com problema xyz". */
 export interface WorkOrderOven {
   id: number;
+  enterpriseId: string;
   orderId: number;
   ovenId: number;
   observation: string;
 }
 
-export type NewWorkOrderOven = Omit<WorkOrderOven, 'id'>;
+export type NewWorkOrderOven = Omit<WorkOrderOven, 'id' | 'enterpriseId'>;

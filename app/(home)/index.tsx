@@ -27,9 +27,9 @@ export default function Home() {
         <View>
           <Text style={styles.saudacao}>Olá, {user?.name ?? ''}</Text>
           <Text style={styles.subtitulo}>
-            {user?.role === 'technician'
+            {user?.role === 'TECHNICAL'
               ? 'Perfil: técnico'
-              : user?.role === 'client'
+              : user?.role === 'CLIENT'
                 ? 'Perfil: cliente'
                 : ''}
           </Text>

@@ -15,8 +15,10 @@ import {
   maintenanceUseCase,
 } from '../../../../../../infra/ioc/container';
 import { colors, spacing, radius } from '../../../../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 export default function NovaManutencao() {
+  const { user } = useAuth();
   const { ordemId, fornoId } = useLocalSearchParams<{ ordemId: string; fornoId: string }>();
   const orderId = Number(ordemId);
   const ovenId = Number(fornoId);
@@ -32,14 +34,18 @@ export default function NovaManutencao() {
   const [erro, setErro] = useState<string | null>(null);
 
   const carregar = useCallback(async () => {
-    const associacoes = await ovenUseCase.findPartsOfOven(ovenId);
+    const enterpriseId = user!.enterpriseId;
+    const associacoes = await ovenUseCase.findPartsOfOven(enterpriseId, ovenId);
     const [pecas, registradas] = await Promise.all([
-      partUseCase.findByIds(associacoes.map((a) => a.partId)),
-      maintenanceUseCase.findByOrderAndOven(orderId, ovenId),
+      partUseCase.findByIds(
+        enterpriseId,
+        associacoes.map((a) => a.partId),
+      ),
+      maintenanceUseCase.findByOrderAndOven(enterpriseId, orderId, ovenId),
     ]);
     setPecasDoForno(pecas);
     setJaRegistradas(registradas);
-  }, [ovenId, orderId]);
+  }, [ovenId, orderId, user]);
 
   useFocusEffect(
     useCallback(() => {
@@ -70,7 +76,7 @@ export default function NovaManutencao() {
     }
     setSalvando(true);
     try {
-      await maintenanceUseCase.register(orderId, ovenId, pendentes);
+      await maintenanceUseCase.register(user!.enterpriseId, orderId, ovenId, pendentes);
       router.back();
     } finally {
       setSalvando(false);

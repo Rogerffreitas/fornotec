@@ -9,49 +9,51 @@ export class WorkOrderInteractor implements WorkOrderUseCase {
     private readonly ovenUseCase: OvenUseCase,
   ) {}
 
-  async findAll(): Promise<WorkOrder[]> {
-    return this.gateway.findAll();
+  async findAll(enterpriseId: string): Promise<WorkOrder[]> {
+    return this.gateway.findAll(enterpriseId);
   }
 
-  async findWithFilter(storeId?: number): Promise<WorkOrder[]> {
-    const all = await this.gateway.findAll();
+  async findWithFilter(enterpriseId: string, storeId?: number): Promise<WorkOrder[]> {
+    const all = await this.gateway.findAll(enterpriseId);
     if (!storeId) return all;
     return all.filter((o) => o.storeId === storeId);
   }
 
-  async findById(id: number): Promise<WorkOrder | undefined> {
-    return this.gateway.findById(id);
+  async findById(enterpriseId: string, id: number): Promise<WorkOrder | undefined> {
+    return this.gateway.findById(enterpriseId, id);
   }
 
-  async findOvensOfOrder(orderId: number): Promise<WorkOrderOven[]> {
-    return this.gateway.findOvensByOrder(orderId);
+  async findOvensOfOrder(enterpriseId: string, orderId: number): Promise<WorkOrderOven[]> {
+    return this.gateway.findOvensByOrder(enterpriseId, orderId);
   }
 
   async create(
+    enterpriseId: string,
     data: NewWorkOrder,
     ovens: OvenOfNewOrder[],
   ): Promise<{ order: WorkOrder; orderOvens: WorkOrderOven[] }> {
     if (!ovens.length) throw new Error('É obrigatório escolher ao menos um forno.');
-    const order = await this.gateway.create(data);
+    const order = await this.gateway.create(enterpriseId, data);
     const orderOvens = await this.gateway.createOvens(
+      enterpriseId,
       ovens.map((o) => ({ orderId: order.id, ovenId: o.ovenId, observation: o.observation })),
     );
     return { order, orderOvens };
   }
 
   /** Finaliza a ordem e propaga última/próxima manutenção para os fornos envolvidos. */
-  async finalize(id: number): Promise<WorkOrder> {
-    const order = await this.gateway.updateStatus(id, 'finalizada');
-    const orderOvens = await this.gateway.findOvensByOrder(id);
+  async finalize(enterpriseId: string, id: number): Promise<WorkOrder> {
+    const order = await this.gateway.updateStatus(enterpriseId, id, 'finalizada');
+    const orderOvens = await this.gateway.findOvensByOrder(enterpriseId, id);
     await Promise.all(
       orderOvens.map((oo) =>
-        this.ovenUseCase.registerCompletedMaintenance(oo.ovenId, order.createdAt),
+        this.ovenUseCase.registerCompletedMaintenance(enterpriseId, oo.ovenId, order.createdAt),
       ),
     );
     return order;
   }
 
-  async cancel(id: number): Promise<WorkOrder> {
-    return this.gateway.updateStatus(id, 'cancelada');
+  async cancel(enterpriseId: string, id: number): Promise<WorkOrder> {
+    return this.gateway.updateStatus(enterpriseId, id, 'cancelada');
   }
 }

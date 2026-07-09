@@ -8,8 +8,10 @@ import { Store } from '../../../../domain/entities/Store';
 import { storeUseCase, ovenUseCase } from '../../../../infra/ioc/container';
 import { OVEN_DESCRIPTION_MAX_LENGTH } from '../../../../domain/entities/Oven';
 import { colors, spacing, radius } from '../../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 export default function NovoForno() {
+  const { user } = useAuth();
   const [lojas, setLojas] = useState<Store[]>([]);
   const [storeId, setStoreId] = useState<number | null>(null);
   const [assetNumber, setAssetNumber] = useState('');
@@ -23,10 +25,11 @@ export default function NovoForno() {
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    storeUseCase.findAll().then((resultado) => {
+    storeUseCase.findAll(user!.enterpriseId).then((resultado) => {
       setLojas(resultado);
       setStoreId(resultado[0]?.id ?? null);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const frequenciaNumero = Number(maintenanceFrequency);
@@ -40,7 +43,7 @@ export default function NovoForno() {
     setErro(null);
     setSalvando(true);
     try {
-      await ovenUseCase.create({
+      await ovenUseCase.create(user!.enterpriseId, {
         storeId,
         assetNumber: assetNumber.trim() || undefined,
         description: description.trim(),

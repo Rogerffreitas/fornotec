@@ -11,6 +11,7 @@ import { Store } from '../../../domain/entities/Store';
 import { Oven } from '../../../domain/entities/Oven';
 import { storeUseCase, ovenUseCase } from '../../../infra/ioc/container';
 import { colors, spacing, radius } from '../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 function formatarData(iso: string | null): string {
   if (!iso) return '—';
@@ -18,6 +19,7 @@ function formatarData(iso: string | null): string {
 }
 
 export default function Fornos() {
+  const { user } = useAuth();
   const [lojas, setLojas] = useState<Store[]>([]);
   const [storeId, setStoreId] = useState<number | null>(null);
   const [fornos, setFornos] = useState<Oven[]>([]);
@@ -25,17 +27,21 @@ export default function Fornos() {
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
-    storeUseCase.findAll().then((resultado) => {
+    storeUseCase.findAll(user!.enterpriseId).then((resultado) => {
       setLojas(resultado);
       setStoreId((atual) => atual ?? resultado[0]?.id ?? null);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const carregar = useCallback(async (id: number, texto: string) => {
-    setCarregando(true);
-    setFornos(await ovenUseCase.findByStore(id, texto));
-    setCarregando(false);
-  }, []);
+  const carregar = useCallback(
+    async (id: number, texto: string) => {
+      setCarregando(true);
+      setFornos(await ovenUseCase.findByStore(user!.enterpriseId, id, texto));
+      setCarregando(false);
+    },
+    [user],
+  );
 
   useFocusEffect(
     useCallback(() => {

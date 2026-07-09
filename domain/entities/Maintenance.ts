@@ -6,6 +6,7 @@ import { ServiceType } from '../types';
  */
 export interface Maintenance {
   id: number;
+  enterpriseId: string;
   orderId: number;
   ovenId: number;
   partId: number;

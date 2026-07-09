@@ -5,6 +5,7 @@
  */
 export interface OvenPart {
   id: number;
+  enterpriseId: string;
   ovenId: number;
   partId: number;
 }

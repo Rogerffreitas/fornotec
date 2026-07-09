@@ -1,5 +1,6 @@
 export interface Store {
   id: number;
+  enterpriseId: string;
   /** Obrigatório, máx. 100 caracteres. */
   description: string;
   /** Obrigatório, máx. 100 caracteres. */
@@ -10,6 +11,6 @@ export interface Store {
   contactNumber?: string;
 }
 
-export type NewStore = Omit<Store, 'id'>;
+export type NewStore = Omit<Store, 'id' | 'enterpriseId'>;
 
 export const STORE_FIELD_MAX_LENGTH = 100;

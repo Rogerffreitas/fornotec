@@ -32,6 +32,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(result.user);
       setToken(result.token);
       return true;
+    } catch {
+      // authenticate() só rejeita para falhas de rede/CORS/servidor fora do ar —
+      // credenciais inválidas retornam `undefined` acima, sem lançar.
+      setError('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
+      return false;
     } finally {
       setLoading(false);
     }

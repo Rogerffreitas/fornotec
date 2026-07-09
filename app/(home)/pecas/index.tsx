@@ -11,17 +11,22 @@ import { Part } from '../../../domain/entities/Part';
 import { findLocation } from '../../../domain/types';
 import { partUseCase } from '../../../infra/ioc/container';
 import { spacing } from '../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Pecas() {
+  const { user } = useAuth();
   const [pecas, setPecas] = useState<Part[]>([]);
   const [filtro, setFiltro] = useState('');
   const [carregando, setCarregando] = useState(true);
 
-  const carregar = useCallback(async (texto: string) => {
-    setCarregando(true);
-    setPecas(await partUseCase.findWithFilter(texto));
-    setCarregando(false);
-  }, []);
+  const carregar = useCallback(
+    async (texto: string) => {
+      setCarregando(true);
+      setPecas(await partUseCase.findWithFilter(user!.enterpriseId, texto));
+      setCarregando(false);
+    },
+    [user],
+  );
 
   useFocusEffect(
     useCallback(() => {

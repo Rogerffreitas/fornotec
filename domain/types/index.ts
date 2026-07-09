@@ -1,5 +1,5 @@
-/** Papel do usuário no sistema. O checkbox de login escolhe entre technician/client. */
-export type Role = 'admin' | 'client' | 'technician';
+/** Papel do usuário no sistema, conforme retornado pela API no JWT. */
+export type Role = 'ADMIN' | 'TECHNICAL' | 'CLIENT';
 
 /** Status da ordem de serviço. */
 export const WORK_ORDER_STATUSES = ['pendente', 'finalizada', 'cancelada'] as const;

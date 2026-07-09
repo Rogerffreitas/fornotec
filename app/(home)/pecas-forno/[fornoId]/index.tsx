@@ -9,8 +9,10 @@ import { Part } from '../../../../domain/entities/Part';
 import { findLocation } from '../../../../domain/types';
 import { partUseCase, ovenUseCase } from '../../../../infra/ioc/container';
 import { colors, spacing, radius } from '../../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
 
 export default function PecasDoForno() {
+  const { user } = useAuth();
   const { fornoId } = useLocalSearchParams<{ fornoId: string }>();
   const id = Number(fornoId);
 
@@ -21,13 +23,13 @@ export default function PecasDoForno() {
 
   const carregar = useCallback(async () => {
     const [todas, associacoes] = await Promise.all([
-      partUseCase.findAll(),
-      ovenUseCase.findPartsOfOven(id),
+      partUseCase.findAll(user!.enterpriseId),
+      ovenUseCase.findPartsOfOven(user!.enterpriseId, id),
     ]);
     setTodasPecas(todas);
     setIdsJaLigados(associacoes.map((a) => a.partId));
     setSelecionadas([]);
-  }, [id]);
+  }, [id, user]);
 
   useFocusEffect(
     useCallback(() => {
@@ -45,7 +47,7 @@ export default function PecasDoForno() {
     if (!selecionadas.length) return;
     setSalvando(true);
     try {
-      await ovenUseCase.addPartsToOven(id, selecionadas);
+      await ovenUseCase.addPartsToOven(user!.enterpriseId, id, selecionadas);
       await carregar();
     } finally {
       setSalvando(false);

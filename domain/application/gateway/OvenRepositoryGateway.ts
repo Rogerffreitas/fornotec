@@ -2,15 +2,16 @@ import { Oven, NewOven } from '../../entities/Oven';
 import { OvenPart } from '../../entities/OvenPart';
 
 export interface OvenRepositoryGateway {
-  findAll(): Promise<Oven[]>;
-  findByStore(storeId: number): Promise<Oven[]>;
-  findById(id: number): Promise<Oven | undefined>;
-  create(data: NewOven): Promise<Oven>;
+  findAll(enterpriseId: string): Promise<Oven[]>;
+  findByStore(enterpriseId: string, storeId: number): Promise<Oven[]>;
+  findById(enterpriseId: string, id: number): Promise<Oven | undefined>;
+  create(enterpriseId: string, data: NewOven): Promise<Oven>;
   updateMaintenanceDates(
+    enterpriseId: string,
     id: number,
     lastMaintenance: string,
     nextMaintenance: string,
   ): Promise<Oven>;
-  findPartsByOven(ovenId: number): Promise<OvenPart[]>;
-  addParts(ovenId: number, partIds: number[]): Promise<OvenPart[]>;
+  findPartsByOven(enterpriseId: string, ovenId: number): Promise<OvenPart[]>;
+  addParts(enterpriseId: string, ovenId: number, partIds: number[]): Promise<OvenPart[]>;
 }

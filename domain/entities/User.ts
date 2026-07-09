@@ -7,6 +7,7 @@ export interface User {
   /** Sempre armazenada como hash (bcryptjs), nunca em texto puro. */
   password: string;
   role: Role;
+  enterpriseId: string;
 }
 
 export interface NewUser {
@@ -15,7 +16,16 @@ export interface NewUser {
   /** Senha em texto puro recebida do formulário; o Interactor faz o hash antes de persistir. */
   password: string;
   role: Role;
+  enterpriseId: string;
 }
 
-/** Dados públicos do usuário autenticado — nunca inclui a senha/hash. */
-export type AuthenticatedUser = Omit<User, 'password'>;
+/** Dados do usuário autenticado, extraídos do JWT decodificado no login. */
+export interface AuthenticatedUser {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  role: Role;
+  enterpriseId: string;
+  enterpriseName: string;
+}
