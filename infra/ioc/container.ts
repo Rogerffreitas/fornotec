@@ -31,7 +31,7 @@ import { WorkOrderInteractor } from '../../domain/interactors/workOrderInteracto
 import { MaintenanceInteractor } from '../../domain/interactors/maintenanceInteractor';
 import { UserInteractor } from '../../domain/interactors/userInteractor';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
+//const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
 
 export const storeUseCase = new StoreInteractor(new StoreRepositoryGatewayImpl());
 export const partUseCase = new PartInteractor(new PartRepositoryGatewayImpl());
@@ -44,7 +44,7 @@ export const workOrderUseCase = new WorkOrderInteractor(
 );
 
 export const userUseCase = new UserInteractor(
-  new UserRepositoryGatewayApi(new FetchHttpClientAdapter(API_URL)),
+  new UserRepositoryGatewayApi(new FetchHttpClientAdapter('http://164.152.34.165:3000/api/v1')),
   new BcryptEncrypter(),
 );
 

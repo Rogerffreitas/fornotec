@@ -22,9 +22,10 @@ npm run format             # prettier --write .
 npm run format:check
 
 npm run build:web        # expo export --platform web -> dist/
-```
 
-There is no test suite/framework configured in this repo.
+npm test                 # jest — currently covers the login flow only
+npm run test:watch
+```
 
 Login calls a real API — set `EXPO_PUBLIC_API_URL` (see `.env.example`) before running. There's no
 mocked login anymore; credentials must exist on the real backend.
@@ -85,6 +86,7 @@ No screen under `app/` needs to change.
 - **Login/JWT**: `UserRepositoryGatewayApi` posts `{ username, password, role }` to `/auth/signin` and gets back `{ accessToken: { token, type } }`. `decodeJwtPayload` (in `infra/security/decodeJwt.ts`) decodes the JWT payload manually (no `atob`/`Buffer`, for Hermes compatibility) to read `user.enterpriseId`/`role` and `enterprise.name` — signature/expiry validation is the backend's job. `Role` mirrors the API casing (`'ADMIN' | 'TECHNICAL' | 'CLIENT'`); the login screen's checkbox stays lowercase (`LoginRole`) and maps via `LOGIN_ROLE_TO_ROLE` in `components/RoleToggle.tsx`.
 - **Login by profile**: Técnico/Cliente checkbox + user/password; authentication requires username, password, and selected profile to all match.
 - **Multi-tenant demo data**: the in-memory seed (`infra/repositories/seed.ts`) is stamped with `DEMO_ENTERPRISE_ID`, matching the enterprise of the real test account used during development. Logging in with a different real company will legitimately show empty lists for Store/Oven/Part/WorkOrder/Maintenance until those resources also move to the real API.
+- **Tests**: `jest` + `jest-expo` preset, `@testing-library/react-native` for the `AuthContext` hook (pinned to v13 — v14 requires React 19, this project is on React 18). Test files live in a `__test__/` folder next to the source they cover (`infra/security/__test__/decodeJwt.test.ts`, `domain/interactors/__test__/userInteractor.test.ts`, `infra/repositories/__test__/UserRepositoryGatewayApi.test.ts`, `context/__test__/AuthContext.test.tsx`) — covers JWT decoding, the `HttpError` vs. network-error distinction in `UserInteractor.authenticate`, the real `/auth/signin` request shape, and the two different login error messages surfaced by `AuthContext`.
 - **Part reference**: `${location}00${id}` (e.g. `CC005`).
 - **Oven reference**: optional, free text.
 - **Oven's last maintenance** is updated when a work order is finalized; next maintenance = last + `maintenanceFrequency` (days).
