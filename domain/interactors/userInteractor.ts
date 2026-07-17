@@ -33,6 +33,7 @@ export class UserInteractor implements UserUseCase {
     try {
       const { token } = await this.gateway.authenticate(username, password, role);
       const payload = decodeJwtPayload<DecodedToken>(token);
+      if (payload.user.role !== role) return undefined;
       return { user: toAuthenticatedUser(payload), token };
     } catch (error) {
       // HttpError = o servidor respondeu recusando (ex: 401 de credenciais inválidas).

@@ -64,6 +64,15 @@ describe('UserInteractor.authenticate', () => {
     });
   });
 
+  it('returns undefined when the token role does not match the selected login role', async () => {
+    const gateway = makeGateway({
+      authenticate: jest.fn().mockResolvedValue({ token: buildToken(VALID_PAYLOAD) }),
+    });
+    const interactor = new UserInteractor(gateway, makeEncrypter());
+
+    await expect(interactor.authenticate('rogerffreitas', 'exemplo', 'CLIENT')).resolves.toBeUndefined();
+  });
+
   it('returns undefined when the gateway rejects with an HttpError (invalid credentials)', async () => {
     const gateway = makeGateway({
       authenticate: jest.fn().mockRejectedValue(new HttpError(401, '/auth/signin')),
