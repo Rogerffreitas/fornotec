@@ -1,9 +1,11 @@
 import {
   MaintenanceRepositoryGateway,
   CreateMaintenanceInput,
+  MaintenanceFilters,
+  MaintenancePage,
 } from '../../domain/application/gateway/MaintenanceRepositoryGateway';
 import { Maintenance } from '../../domain/entities/Maintenance';
-import { maintenances } from './seed';
+import { maintenances, ovens } from './seed';
 import { delay, nextId } from './utils';
 
 export class MaintenanceRepositoryGatewayImpl implements MaintenanceRepositoryGateway {
@@ -21,6 +23,24 @@ export class MaintenanceRepositoryGatewayImpl implements MaintenanceRepositoryGa
         (m) => m.enterpriseId === enterpriseId && m.orderId === orderId && m.ovenId === ovenId,
       ),
     );
+  }
+
+  async findPage(enterpriseId: string, filters: MaintenanceFilters): Promise<MaintenancePage> {
+    const ovenIdsDaLoja = filters.storeId
+      ? new Set(
+          ovens
+            .filter((o) => o.enterpriseId === enterpriseId && o.storeId === filters.storeId)
+            .map((o) => o.id),
+        )
+      : null;
+    const todas = maintenances.filter(
+      (m) =>
+        m.enterpriseId === enterpriseId &&
+        (!filters.ovenId || m.ovenId === filters.ovenId) &&
+        (!ovenIdsDaLoja || ovenIdsDaLoja.has(m.ovenId)),
+    );
+    const inicio = (filters.page - 1) * filters.pageSize;
+    return delay({ items: todas.slice(inicio, inicio + filters.pageSize), total: todas.length });
   }
 
   async createMany(

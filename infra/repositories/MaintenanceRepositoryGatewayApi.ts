@@ -1,6 +1,8 @@
 import {
   MaintenanceRepositoryGateway,
   CreateMaintenanceInput,
+  MaintenanceFilters,
+  MaintenancePage,
 } from '../../domain/application/gateway/MaintenanceRepositoryGateway';
 import { Maintenance } from '../../domain/entities/Maintenance';
 import { HttpClient } from '../../domain/application/infra/HttpClient';
@@ -21,6 +23,18 @@ export class MaintenanceRepositoryGatewayApi implements MaintenanceRepositoryGat
     return this.http.get<Maintenance[]>('/maintenances', {
       headers: authHeader(),
       params: { orderId, ovenId },
+    });
+  }
+
+  async findPage(_enterpriseId: string, filters: MaintenanceFilters): Promise<MaintenancePage> {
+    return this.http.get<MaintenancePage>('/maintenances', {
+      headers: authHeader(),
+      params: {
+        page: filters.page,
+        pageSize: filters.pageSize,
+        ...(filters.storeId ? { storeId: filters.storeId } : {}),
+        ...(filters.ovenId ? { ovenId: filters.ovenId } : {}),
+      },
     });
   }
 

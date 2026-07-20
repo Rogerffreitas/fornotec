@@ -1,8 +1,10 @@
 import { Maintenance, NewMaintenanceItem } from '../entities/Maintenance';
+import { MaintenanceFilters, MaintenancePage } from '../application/gateway/MaintenanceRepositoryGateway';
 
 export interface MaintenanceUseCase {
   findAll(enterpriseId: string): Promise<Maintenance[]>;
   findByOrderAndOven(enterpriseId: string, orderId: number, ovenId: number): Promise<Maintenance[]>;
+  findPage(enterpriseId: string, filters: MaintenanceFilters): Promise<MaintenancePage>;
   register(
     enterpriseId: string,
     orderId: number,

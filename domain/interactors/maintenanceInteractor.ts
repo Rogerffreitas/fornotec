@@ -1,5 +1,9 @@
 import { MaintenanceUseCase } from '../use-case/maintenanceUseCase';
-import { MaintenanceRepositoryGateway } from '../application/gateway/MaintenanceRepositoryGateway';
+import {
+  MaintenanceRepositoryGateway,
+  MaintenanceFilters,
+  MaintenancePage,
+} from '../application/gateway/MaintenanceRepositoryGateway';
 import { Maintenance, NewMaintenanceItem } from '../entities/Maintenance';
 
 export class MaintenanceInteractor implements MaintenanceUseCase {
@@ -15,6 +19,10 @@ export class MaintenanceInteractor implements MaintenanceUseCase {
     ovenId: number,
   ): Promise<Maintenance[]> {
     return this.gateway.findByOrderAndOven(enterpriseId, orderId, ovenId);
+  }
+
+  async findPage(enterpriseId: string, filters: MaintenanceFilters): Promise<MaintenancePage> {
+    return this.gateway.findPage(enterpriseId, filters);
   }
 
   /** Registra um lote — um registro por peça selecionada no formulário. */
