@@ -6,7 +6,7 @@ export const WORK_ORDER_STATUSES = ['pendente', 'finalizada', 'cancelada'] as co
 export type WorkOrderStatus = (typeof WORK_ORDER_STATUSES)[number];
 
 /** Serviço executado em uma peça durante uma manutenção. */
-export const SERVICE_TYPES = ['Substituição', 'Inspeção', 'Manutenção'] as const;
+export const SERVICE_TYPES = ['Substituição', 'Inspeção', 'Manutenção', 'Instalação'] as const;
 export type ServiceType = (typeof SERVICE_TYPES)[number];
 
 /** Localização física da peça dentro do forno. */

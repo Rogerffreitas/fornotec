@@ -5,6 +5,7 @@ import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { EmptyState } from '../../../../components/EmptyState';
+import { ServiceTypeChip } from '../../../../components/ServiceTypeChip';
 import { WorkOrder, WorkOrderOven } from '../../../../domain/entities/WorkOrder';
 import { Oven } from '../../../../domain/entities/Oven';
 import { Store } from '../../../../domain/entities/Store';
@@ -183,15 +184,12 @@ export default function NovaManutencao() {
             <Text style={styles.secao}>Status</Text>
             <View style={styles.chips}>
               {SERVICE_TYPES.map((s) => (
-                <Pressable
+                <ServiceTypeChip
                   key={s}
+                  tipo={s}
+                  selecionado={servico === s}
                   onPress={() => setServico(s)}
-                  style={[styles.chip, servico === s && styles.chipSelecionado]}
-                >
-                  <Text style={[styles.chipTexto, servico === s && styles.chipTextoSelecionado]}>
-                    {s}
-                  </Text>
-                </Pressable>
+                />
               ))}
             </View>
 

@@ -7,6 +7,7 @@ interface Props {
   subtitulo?: string;
   detalhes?: string;
   badge?: { texto: string; tom: 'sucesso' | 'aviso' | 'perigo' | 'neutro' };
+  badgeNode?: React.ReactNode;
   onPress?: () => void;
 }
 
@@ -17,16 +18,16 @@ const TONS: Record<NonNullable<Props['badge']>['tom'], { bg: string; texto: stri
   neutro: { bg: '#E5E7EB', texto: '#374151' },
 };
 
-export function ListRow({ titulo, subtitulo, detalhes, badge, onPress }: Props) {
+export function ListRow({ titulo, subtitulo, detalhes, badge, badgeNode, onPress }: Props) {
   const conteudo = (
     <>
       <View style={styles.cabecalho}>
         <Text style={styles.titulo}>{titulo}</Text>
-        {badge ? (
+        {badgeNode ?? (badge ? (
           <View style={[styles.badge, { backgroundColor: TONS[badge.tom].bg }]}>
             <Text style={[styles.badgeTexto, { color: TONS[badge.tom].texto }]}>{badge.texto}</Text>
           </View>
-        ) : null}
+        ) : null)}
       </View>
       {subtitulo ? <Text style={styles.subtitulo}>{subtitulo}</Text> : null}
       {detalhes ? <Text style={styles.detalhes}>{detalhes}</Text> : null}

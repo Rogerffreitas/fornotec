@@ -6,6 +6,7 @@ import { Screen } from '../../../../../../components/Screen';
 import { TextField } from '../../../../../../components/TextField';
 import { PrimaryButton } from '../../../../../../components/PrimaryButton';
 import { EmptyState } from '../../../../../../components/EmptyState';
+import { ServiceTypeChip } from '../../../../../../components/ServiceTypeChip';
 import { Part } from '../../../../../../domain/entities/Part';
 import { Maintenance, NewMaintenanceItem } from '../../../../../../domain/entities/Maintenance';
 import { SERVICE_TYPES, ServiceType } from '../../../../../../domain/types';
@@ -97,9 +98,10 @@ export default function NovaManutencao() {
             <Text style={styles.secao}>Já registradas nesta ordem</Text>
             {jaRegistradas.map((m) => (
               <View key={m.id} style={styles.itemRegistrado}>
-                <Text style={styles.itemRegistradoTexto}>
-                  {nomePeca(m.partId)} · {m.serviceType}
-                </Text>
+                <View style={styles.itemCabecalho}>
+                  <Text style={styles.itemRegistradoTexto}>{nomePeca(m.partId)}</Text>
+                  <ServiceTypeChip tipo={m.serviceType} />
+                </View>
                 {m.observation ? (
                   <Text style={styles.itemRegistradoObs}>{m.observation}</Text>
                 ) : null}
@@ -130,15 +132,12 @@ export default function NovaManutencao() {
         <Text style={styles.secao}>Serviço executado</Text>
         <View style={styles.chips}>
           {SERVICE_TYPES.map((s) => (
-            <Pressable
+            <ServiceTypeChip
               key={s}
+              tipo={s}
+              selecionado={servico === s}
               onPress={() => setServico(s)}
-              style={[styles.chip, servico === s && styles.chipSelecionado]}
-            >
-              <Text style={[styles.chipTexto, servico === s && styles.chipTextoSelecionado]}>
-                {s}
-              </Text>
-            </Pressable>
+            />
           ))}
         </View>
 
@@ -162,9 +161,10 @@ export default function NovaManutencao() {
             {pendentes.map((item, index) => (
               <View key={index} style={styles.itemPendente}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.itemPendenteTexto}>
-                    {nomePeca(item.partId)} · {item.serviceType}
-                  </Text>
+                  <View style={styles.itemCabecalho}>
+                    <Text style={styles.itemPendenteTexto}>{nomePeca(item.partId)}</Text>
+                    <ServiceTypeChip tipo={item.serviceType} />
+                  </View>
                   {item.observation ? (
                     <Text style={styles.itemRegistradoObs}>{item.observation}</Text>
                   ) : null}
@@ -204,6 +204,12 @@ const styles = StyleSheet.create({
   chipTexto: { fontSize: 13, color: colors.text },
   chipTextoSelecionado: { color: colors.primaryDark, fontWeight: '600' },
   erro: { color: colors.danger, marginBottom: spacing.md },
+  itemCabecalho: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
   itemRegistrado: {
     backgroundColor: colors.highlight,
     borderRadius: radius.sm,

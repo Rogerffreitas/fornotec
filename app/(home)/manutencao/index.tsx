@@ -5,6 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../../../components/Screen';
 import { FilterInput } from '../../../components/FilterInput';
 import { ListRow } from '../../../components/ListRow';
+import { ServiceTypeChip } from '../../../components/ServiceTypeChip';
 import { EmptyState } from '../../../components/EmptyState';
 import { PrimaryButton } from '../../../components/PrimaryButton';
 import { Maintenance } from '../../../domain/entities/Maintenance';
@@ -75,8 +76,9 @@ export default function Manutencoes() {
         renderItem={({ item }) => (
           <ListRow
             titulo={`OS #${item.orderId} · ${fornosPorId[item.ovenId]?.description ?? 'Forno'} · ${pecasPorId[item.partId]?.description ?? 'Peça'}`}
-            subtitulo={`${item.serviceType} · ${formatarData(item.maintenanceDate)}`}
+            subtitulo={formatarData(item.maintenanceDate)}
             detalhes={item.observation}
+            badgeNode={<ServiceTypeChip tipo={item.serviceType} />}
           />
         )}
       />
