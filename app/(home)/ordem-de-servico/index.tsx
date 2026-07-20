@@ -4,6 +4,8 @@ import { router } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../../../components/Screen';
 import { ListRow } from '../../../components/ListRow';
+import { PriorityChip } from '../../../components/PriorityChip';
+import { WorkOrderStatusBadge } from '../../../components/WorkOrderStatusBadge';
 import { EmptyState } from '../../../components/EmptyState';
 import { PrimaryButton } from '../../../components/PrimaryButton';
 import { WorkOrder } from '../../../domain/entities/WorkOrder';
@@ -14,12 +16,6 @@ import { useAuth } from '@/context/AuthContext';
 
 function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR');
-}
-
-function badgeDoStatus(status: WorkOrder['status']) {
-  if (status === 'finalizada') return { texto: 'Finalizada', tom: 'sucesso' as const };
-  if (status === 'cancelada') return { texto: 'Cancelada', tom: 'perigo' as const };
-  return { texto: 'Pendente', tom: 'aviso' as const };
 }
 
 export default function OrdensDeServico() {
@@ -77,6 +73,7 @@ export default function OrdensDeServico() {
       />
 
       <FlatList
+        style={styles.lista}
         data={ordens}
         keyExtractor={(item) => String(item.id)}
         refreshing={carregando}
@@ -87,7 +84,12 @@ export default function OrdensDeServico() {
             titulo={`OS #${item.id} · ${lojasPorId[item.storeId]?.description ?? ''}`}
             subtitulo={lojasPorId[item.storeId]?.address}
             detalhes={formatarData(item.createdAt)}
-            badge={badgeDoStatus(item.status)}
+            badgeNode={
+              <View style={styles.badges}>
+                <PriorityChip prioridade={item.priority} />
+                <WorkOrderStatusBadge status={item.status} />
+              </View>
+            }
             onPress={() => router.push(`/ordem-de-servico/${item.id}`)}
           />
         )}
@@ -109,7 +111,9 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
-  chipsLista: { marginBottom: spacing.md },
+  chipsLista: { flexGrow: 0, marginBottom: spacing.md },
+  lista: { flex: 1 },
+  badges: { flexDirection: 'row', gap: spacing.xs, flexWrap: 'wrap', justifyContent: 'flex-end' },
   chip: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,

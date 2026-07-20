@@ -5,6 +5,17 @@ export type Role = 'ADMIN' | 'TECHNICAL' | 'CLIENT';
 export const WORK_ORDER_STATUSES = ['pendente', 'finalizada', 'cancelada'] as const;
 export type WorkOrderStatus = (typeof WORK_ORDER_STATUSES)[number];
 
+/** Prioridade da ordem de serviço. */
+export const WORK_ORDER_PRIORITIES = ['baixa', 'media', 'alta', 'urgente'] as const;
+export type WorkOrderPriority = (typeof WORK_ORDER_PRIORITIES)[number];
+
+export const WORK_ORDER_PRIORITY_LABELS: Record<WorkOrderPriority, string> = {
+  baixa: 'Baixa',
+  media: 'Média',
+  alta: 'Alta',
+  urgente: 'Urgente',
+};
+
 /** Serviço executado em uma peça durante uma manutenção. */
 export const SERVICE_TYPES = ['Substituição', 'Inspeção', 'Manutenção', 'Instalação'] as const;
 export type ServiceType = (typeof SERVICE_TYPES)[number];

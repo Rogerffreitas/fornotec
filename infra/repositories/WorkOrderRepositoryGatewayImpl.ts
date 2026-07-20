@@ -25,6 +25,7 @@ export class WorkOrderRepositoryGatewayImpl implements WorkOrderRepositoryGatewa
       storeId: data.storeId,
       createdAt: new Date().toISOString(),
       status: 'pendente',
+      priority: data.priority ?? 'media',
     };
     workOrders.push(order);
     return delay(order);

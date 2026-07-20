@@ -5,8 +5,10 @@ import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { EmptyState } from '../../../../components/EmptyState';
+import { PriorityChip } from '../../../../components/PriorityChip';
 import { Store } from '../../../../domain/entities/Store';
 import { Oven } from '../../../../domain/entities/Oven';
+import { WORK_ORDER_PRIORITIES, WorkOrderPriority } from '../../../../domain/types';
 import { storeUseCase, ovenUseCase, workOrderUseCase } from '../../../../infra/ioc/container';
 import { colors, spacing, radius } from '../../../../components/theme';
 import { useAuth } from '@/context/AuthContext';
@@ -20,6 +22,7 @@ export default function NovaOrdem() {
   const { user } = useAuth();
   const [lojas, setLojas] = useState<Store[]>([]);
   const [storeId, setStoreId] = useState<number | null>(null);
+  const [prioridade, setPrioridade] = useState<WorkOrderPriority>('media');
   const [fornos, setFornos] = useState<Oven[]>([]);
   const [selecoes, setSelecoes] = useState<Record<number, SelecaoForno>>({});
   const [salvando, setSalvando] = useState(false);
@@ -65,12 +68,16 @@ export default function NovaOrdem() {
       setErro('Escolha a loja e ao menos um forno para a ordem.');
       return;
     }
+    if (fornosSelecionados.some((f) => !f.observation.trim())) {
+      setErro('Preencha a observação de cada forno selecionado.');
+      return;
+    }
     setErro(null);
     setSalvando(true);
     try {
       const { order } = await workOrderUseCase.create(
         user!.enterpriseId,
-        { storeId },
+        { storeId, priority: prioridade },
         fornosSelecionados,
       );
       router.replace(`/ordem-de-servico/${order.id}`);
@@ -94,6 +101,18 @@ export default function NovaOrdem() {
                 {loja.description}
               </Text>
             </Pressable>
+          ))}
+        </View>
+
+        <Text style={styles.rotulo}>Prioridade</Text>
+        <View style={styles.chips}>
+          {WORK_ORDER_PRIORITIES.map((p) => (
+            <PriorityChip
+              key={p}
+              prioridade={p}
+              selecionado={prioridade === p}
+              onPress={() => setPrioridade(p)}
+            />
           ))}
         </View>
 
@@ -132,6 +151,11 @@ export default function NovaOrdem() {
           titulo="Criar ordem de serviço"
           onPress={salvar}
           carregando={salvando}
+          desabilitado={
+            !storeId ||
+            !fornosSelecionados.length ||
+            fornosSelecionados.some((f) => !f.observation.trim())
+          }
           style={{ marginTop: spacing.sm, marginBottom: spacing.xl }}
         />
       </ScrollView>

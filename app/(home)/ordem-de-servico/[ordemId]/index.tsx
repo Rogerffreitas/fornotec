@@ -4,6 +4,8 @@ import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../../../../components/Screen';
 import { ListRow } from '../../../../components/ListRow';
+import { PriorityChip } from '../../../../components/PriorityChip';
+import { WorkOrderStatusBadge } from '../../../../components/WorkOrderStatusBadge';
 import { EmptyState } from '../../../../components/EmptyState';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { WorkOrder } from '../../../../domain/entities/WorkOrder';
@@ -122,9 +124,11 @@ export default function DetalheOrdem() {
 
       {ordem ? (
         <View style={styles.resumo}>
-          <Text style={styles.resumoTexto}>
-            {formatarData(ordem.createdAt)} · {ordem.status}
-          </Text>
+          <Text style={styles.resumoTexto}>{formatarData(ordem.createdAt)}</Text>
+          <View style={styles.badges}>
+            <PriorityChip prioridade={ordem.priority} />
+            <WorkOrderStatusBadge status={ordem.status} />
+          </View>
         </View>
       ) : null}
 
@@ -173,8 +177,15 @@ export default function DetalheOrdem() {
 }
 
 const styles = StyleSheet.create({
-  resumo: { marginBottom: spacing.md },
+  resumo: {
+    marginBottom: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
   resumoTexto: { fontSize: 13, color: colors.textSecondary },
+  badges: { flexDirection: 'row', gap: spacing.xs },
   secao: { fontSize: 13, fontWeight: '600', color: colors.textSecondary, marginBottom: spacing.sm },
   acoes: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm },
 });

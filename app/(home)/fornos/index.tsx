@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, Pressable, FlatList, StyleSheet } from 'react-native';
+import { Text, Pressable, FlatList, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../../../components/Screen';
@@ -81,6 +81,7 @@ export default function Fornos() {
       />
 
       <FlatList
+        style={styles.lista}
         data={fornos}
         keyExtractor={(item) => String(item.id)}
         refreshing={carregando}
@@ -111,7 +112,8 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
-  chipsLista: { marginBottom: spacing.md },
+  chipsLista: { flexGrow: 0, marginBottom: spacing.md },
+  lista: { flex: 1 },
   chip: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,

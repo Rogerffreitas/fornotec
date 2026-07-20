@@ -131,6 +131,7 @@ export const workOrders: WorkOrder[] = [
     storeId: 1,
     createdAt: '2026-04-10T00:00:00.000Z',
     status: 'finalizada',
+    priority: 'media',
   },
 ];
 
