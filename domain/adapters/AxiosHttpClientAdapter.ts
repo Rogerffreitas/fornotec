@@ -52,6 +52,18 @@ export class AxiosHttpClientAdapter implements HttpClient {
     }
   }
 
+  async patch<T>(url: string, body: unknown, config?: HttpRequestConfig): Promise<T> {
+    try {
+      const { data } = await this.client.patch<T>(url, body, {
+        headers: config?.headers,
+        params: config?.params,
+      });
+      return data;
+    } catch (error) {
+      throw toHttpError(error, url);
+    }
+  }
+
   async delete<T>(url: string, config?: HttpRequestConfig): Promise<T> {
     try {
       const { data } = await this.client.delete<T>(url, {

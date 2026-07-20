@@ -41,6 +41,10 @@ export class FetchHttpClientAdapter implements HttpClient {
     return this.request<T>('PUT', url, body, config);
   }
 
+  patch<T>(url: string, body: unknown, config?: HttpRequestConfig): Promise<T> {
+    return this.request<T>('PATCH', url, body, config);
+  }
+
   delete<T>(url: string, config?: HttpRequestConfig): Promise<T> {
     return this.request<T>('DELETE', url, undefined, config);
   }

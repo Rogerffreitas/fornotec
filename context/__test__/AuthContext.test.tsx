@@ -3,6 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { AuthProvider, useAuth } from '../AuthContext';
 import { userUseCase } from '../../infra/ioc/container';
 import { AuthenticatedUser } from '../../domain/entities/User';
+import { getAuthToken } from '../../infra/security/session';
 
 jest.mock('../../infra/ioc/container', () => ({
   userUseCase: { authenticate: jest.fn(), register: jest.fn() },
@@ -29,7 +30,7 @@ beforeEach(() => {
 });
 
 describe('AuthContext login', () => {
-  it('stores user and token on successful authentication', async () => {
+  it('stores the user and propagates the token to the session module on successful authentication', async () => {
     authenticateMock.mockResolvedValue({ user: AUTHENTICATED_USER, token: 'jwt-token' });
     const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -41,7 +42,7 @@ describe('AuthContext login', () => {
     expect(ok).toBe(true);
     expect(authenticateMock).toHaveBeenCalledWith('rogerffreitas', 'exemplo', 'TECHNICAL');
     expect(result.current.user).toEqual(AUTHENTICATED_USER);
-    expect(result.current.token).toBe('jwt-token');
+    expect(getAuthToken()).toBe('jwt-token');
     expect(result.current.error).toBeNull();
   });
 
@@ -97,7 +98,7 @@ describe('AuthContext login', () => {
 });
 
 describe('AuthContext logout', () => {
-  it('clears the user and token', async () => {
+  it('clears the user and the session token', async () => {
     authenticateMock.mockResolvedValue({ user: AUTHENTICATED_USER, token: 'jwt-token' });
     const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -111,6 +112,6 @@ describe('AuthContext logout', () => {
     });
 
     expect(result.current.user).toBeNull();
-    expect(result.current.token).toBeNull();
+    expect(getAuthToken()).toBeNull();
   });
 });

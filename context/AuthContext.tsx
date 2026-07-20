@@ -2,10 +2,10 @@ import React, { createContext, useContext, useState, useMemo } from 'react';
 import { AuthenticatedUser } from '../domain/entities/User';
 import { Role } from '../domain/types';
 import { userUseCase } from '../infra/ioc/container';
+import { setAuthToken } from '../infra/security/session';
 
 interface AuthContextValue {
   user: AuthenticatedUser | null;
-  token: string | null;
   loading: boolean;
   error: string | null;
   login: (username: string, password: string, role: Role) => Promise<boolean>;
@@ -16,7 +16,6 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return false;
       }
       setUser(result.user);
-      setToken(result.token);
+      setAuthToken(result.token);
       return true;
     } catch {
       // authenticate() só rejeita para falhas de rede/CORS/servidor fora do ar —
@@ -44,12 +43,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     setUser(null);
-    setToken(null);
+    setAuthToken(null);
   };
 
   const value = useMemo(
-    () => ({ user, token, loading, error, login, logout }),
-    [user, token, loading, error],
+    () => ({ user, loading, error, login, logout }),
+    [user, loading, error],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
