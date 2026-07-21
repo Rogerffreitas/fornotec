@@ -25,6 +25,9 @@ export interface Oven {
 
 export type NewOven = Omit<Oven, 'id' | 'enterpriseId' | 'lastMaintenance' | 'nextMaintenance'>;
 
+/** Loja não é editável depois de criado o forno. */
+export type OvenUpdate = Omit<NewOven, 'storeId'>;
+
 export const OVEN_DESCRIPTION_MAX_LENGTH = 100;
 
 /** Regra de negócio: próxima manutenção = última manutenção + periodicidade (dias). */

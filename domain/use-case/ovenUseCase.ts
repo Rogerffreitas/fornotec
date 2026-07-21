@@ -1,4 +1,4 @@
-import { Oven, NewOven } from '../entities/Oven';
+import { Oven, NewOven, OvenUpdate } from '../entities/Oven';
 import { OvenPart } from '../entities/OvenPart';
 
 export interface OvenUseCase {
@@ -6,6 +6,7 @@ export interface OvenUseCase {
   findByStore(enterpriseId: string, storeId: number, filter?: string): Promise<Oven[]>;
   findById(enterpriseId: string, id: number): Promise<Oven | undefined>;
   create(enterpriseId: string, data: NewOven): Promise<Oven>;
+  update(enterpriseId: string, id: number, data: OvenUpdate): Promise<Oven>;
   /** Chamado internamente quando uma ordem de serviço é finalizada. */
   registerCompletedMaintenance(enterpriseId: string, ovenId: number, orderDate: string): Promise<Oven>;
   findPartsOfOven(enterpriseId: string, ovenId: number): Promise<OvenPart[]>;

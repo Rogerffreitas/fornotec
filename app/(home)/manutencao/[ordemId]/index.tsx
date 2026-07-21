@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Platform, Alert, StyleSheet } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../../../../components/Screen';
@@ -7,6 +7,7 @@ import { PriorityChip } from '../../../../components/PriorityChip';
 import { WorkOrderStatusBadge } from '../../../../components/WorkOrderStatusBadge';
 import { ServiceTypeChip } from '../../../../components/ServiceTypeChip';
 import { EmptyState } from '../../../../components/EmptyState';
+import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { WorkOrder } from '../../../../domain/entities/WorkOrder';
 import { Store } from '../../../../domain/entities/Store';
 import { Oven } from '../../../../domain/entities/Oven';
@@ -18,7 +19,10 @@ import {
   ovenUseCase,
   partUseCase,
   maintenanceUseCase,
+  pdfGenerator,
 } from '../../../../infra/ioc/container';
+import { buildMaintenanceReportPdfDocument } from '../../../../infra/pdf/templates/maintenanceReportPdfTemplate';
+import { baixarPdfNaWeb } from '../../../../infra/pdf/baixarPdfNaWeb';
 import { colors, spacing, radius } from '../../../../components/theme';
 import { useAuth } from '@/context/AuthContext';
 
@@ -36,6 +40,7 @@ export default function ManutencaoDaOrdem() {
   const [fornosDaOrdem, setFornosDaOrdem] = useState<Oven[]>([]);
   const [pecasPorId, setPecasPorId] = useState<Record<number, Part>>({});
   const [manutencoesPorForno, setManutencoesPorForno] = useState<Record<number, Maintenance[]>>({});
+  const [gerandoRelatorio, setGerandoRelatorio] = useState(false);
 
   const carregar = useCallback(async () => {
     const enterpriseId = user!.enterpriseId;
@@ -72,6 +77,47 @@ export default function ManutencaoDaOrdem() {
     }, [carregar]),
   );
 
+  async function baixarRelatorio() {
+    if (fornosDaOrdem.length === 0) return;
+    setGerandoRelatorio(true);
+    try {
+      const enterpriseId = user!.enterpriseId;
+      const todasManutencoes = await maintenanceUseCase.findAll(enterpriseId);
+
+      const itensRelatorio = await Promise.all(
+        fornosDaOrdem.map(async (forno) => {
+          const associacoes = await ovenUseCase.findPartsOfOven(enterpriseId, forno.id);
+          const pecas = associacoes.length
+            ? await partUseCase.findByIds(
+                enterpriseId,
+                associacoes.map((a) => a.partId),
+              )
+            : [];
+          const historico = todasManutencoes.filter((m) => m.ovenId === forno.id);
+          return { oven: forno, pecas, historico };
+        }),
+      );
+
+      const documento = buildMaintenanceReportPdfDocument({
+        loja,
+        enterpriseName: user!.enterpriseName,
+        ordemId: id,
+        itens: itensRelatorio,
+      });
+      const bytes = await pdfGenerator.generate(documento);
+      if (Platform.OS === 'web') {
+        await baixarPdfNaWeb(bytes, `relatorio-manutencao-os-${id}.pdf`);
+      } else {
+        Alert.alert(
+          'Disponível na web',
+          'O download de PDF está disponível na versão web do app por enquanto.',
+        );
+      }
+    } finally {
+      setGerandoRelatorio(false);
+    }
+  }
+
   return (
     <Screen>
       <Stack.Screen options={{ title: `Manutenção OS #${id}` }} />
@@ -88,6 +134,15 @@ export default function ManutencaoDaOrdem() {
             </View>
           </View>
         ) : null}
+
+        <PrimaryButton
+          titulo="Baixar relatório de manutenção"
+          variante="secundaria"
+          onPress={baixarRelatorio}
+          carregando={gerandoRelatorio}
+          desabilitado={fornosDaOrdem.length === 0}
+          style={{ marginBottom: spacing.md }}
+        />
 
         {fornosDaOrdem.length === 0 ? (
           <EmptyState texto="Nenhum forno nesta ordem." />

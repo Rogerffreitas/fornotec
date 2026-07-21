@@ -16,27 +16,17 @@ import {
   workOrderUseCase,
   ovenUseCase,
   storeUseCase,
+  maintenanceUseCase,
+  partUseCase,
   pdfGenerator,
 } from '../../../../infra/ioc/container';
+import { buildWorkOrderPdfDocument } from '../../../../infra/pdf/templates/workOrderPdfTemplate';
+import { baixarPdfNaWeb } from '../../../../infra/pdf/baixarPdfNaWeb';
 import { colors, spacing } from '../../../../components/theme';
 import { useAuth } from '@/context/AuthContext';
 
 function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR');
-}
-
-async function baixarPdfNaWeb(bytes: Uint8Array, nomeArquivo: string) {
-  // @ts-ignore -- globais de navegador, disponíveis apenas quando Platform.OS === 'web'
-  const blob = new Blob([bytes], { type: 'application/pdf' });
-  // @ts-ignore
-  const url = URL.createObjectURL(blob);
-  // @ts-ignore
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = nomeArquivo;
-  link.click();
-  // @ts-ignore
-  URL.revokeObjectURL(url);
 }
 
 export default function DetalheOrdem() {
@@ -97,14 +87,24 @@ export default function DetalheOrdem() {
     if (!ordem) return;
     setGerandoPdf(true);
     try {
-      const bytes = await pdfGenerator.generate({
-        title: `Ordem de Serviço #${ordem.id}`,
-        subtitle: `${loja?.description ?? ''} · ${formatarData(ordem.createdAt)} · ${ordem.status}`,
-        sections: itens.map(({ orderOven, oven }) => ({
-          heading: `${oven.assetNumber || 's/ patrimônio'} · ${oven.description}`,
-          lines: [orderOven.observation || 'Sem observação'],
+      const enterpriseId = user!.enterpriseId;
+      const manutencoes = await maintenanceUseCase.findByOrder(enterpriseId, id);
+      const partIds = [...new Set(manutencoes.map((m) => m.partId))];
+      const pecas = partIds.length > 0 ? await partUseCase.findByIds(enterpriseId, partIds) : [];
+
+      const documento = buildWorkOrderPdfDocument({
+        ordem,
+        loja,
+        enterpriseName: user!.enterpriseName,
+        tecnico: user!.name,
+        pecas,
+        itens: itens.map(({ orderOven, oven }) => ({
+          orderOven,
+          oven,
+          manutencoes: manutencoes.filter((m) => m.ovenId === oven.id),
         })),
       });
+      const bytes = await pdfGenerator.generate(documento);
       if (Platform.OS === 'web') {
         await baixarPdfNaWeb(bytes, `ordem-servico-${ordem.id}.pdf`);
       } else {

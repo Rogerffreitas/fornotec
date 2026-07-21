@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Redirect, router } from 'expo-router';
+import { router } from 'expo-router';
 import { Screen } from '../../components/Screen';
 import { useAuth } from '../../context/AuthContext';
 import { colors, spacing, radius } from '../../components/theme';

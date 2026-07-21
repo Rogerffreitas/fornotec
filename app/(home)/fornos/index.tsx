@@ -92,6 +92,7 @@ export default function Fornos() {
             titulo={`${item.assetNumber || 's/ patrimônio'} · ${item.description}`}
             subtitulo={[item.mark, item.voltage, item.power].filter(Boolean).join(' · ')}
             detalhes={`Última manutenção: ${formatarData(item.lastMaintenance)}  ·  Próxima: ${formatarData(item.nextMaintenance)}`}
+            onPress={() => router.push(`/fornos/${item.id}`)}
           />
         )}
       />

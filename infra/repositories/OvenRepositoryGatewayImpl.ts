@@ -1,5 +1,5 @@
 import { OvenRepositoryGateway } from '../../domain/application/gateway/OvenRepositoryGateway';
-import { Oven, NewOven } from '../../domain/entities/Oven';
+import { Oven, NewOven, OvenUpdate } from '../../domain/entities/Oven';
 import { OvenPart } from '../../domain/entities/OvenPart';
 import { ovens, ovenParts } from './seed';
 import { delay, nextId } from './utils';
@@ -26,6 +26,13 @@ export class OvenRepositoryGatewayImpl implements OvenRepositoryGateway {
       nextMaintenance: null,
     };
     ovens.push(oven);
+    return delay(oven);
+  }
+
+  async update(enterpriseId: string, id: number, data: OvenUpdate): Promise<Oven> {
+    const oven = ovens.find((o) => o.id === id && o.enterpriseId === enterpriseId);
+    if (!oven) throw new Error(`Forno ${id} não encontrado`);
+    Object.assign(oven, data);
     return delay(oven);
   }
 

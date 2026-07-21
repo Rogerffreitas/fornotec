@@ -1,5 +1,5 @@
 import { OvenRepositoryGateway } from '../../domain/application/gateway/OvenRepositoryGateway';
-import { Oven, NewOven } from '../../domain/entities/Oven';
+import { Oven, NewOven, OvenUpdate } from '../../domain/entities/Oven';
 import { OvenPart } from '../../domain/entities/OvenPart';
 import { HttpClient, HttpError } from '../../domain/application/infra/HttpClient';
 import { authHeader } from '../security/session';
@@ -26,6 +26,10 @@ export class OvenRepositoryGatewayApi implements OvenRepositoryGateway {
 
   async create(_enterpriseId: string, data: NewOven): Promise<Oven> {
     return this.http.post<Oven>('/ovens', data, { headers: authHeader() });
+  }
+
+  async update(_enterpriseId: string, id: number, data: OvenUpdate): Promise<Oven> {
+    return this.http.patch<Oven>(`/ovens/${id}`, data, { headers: authHeader() });
   }
 
   async updateMaintenanceDates(

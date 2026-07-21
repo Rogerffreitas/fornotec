@@ -1,6 +1,6 @@
 import { OvenUseCase } from '../use-case/ovenUseCase';
 import { OvenRepositoryGateway } from '../application/gateway/OvenRepositoryGateway';
-import { Oven, NewOven, computeNextMaintenance } from '../entities/Oven';
+import { Oven, NewOven, OvenUpdate, computeNextMaintenance } from '../entities/Oven';
 import { OvenPart } from '../entities/OvenPart';
 
 export class OvenInteractor implements OvenUseCase {
@@ -27,6 +27,10 @@ export class OvenInteractor implements OvenUseCase {
 
   async create(enterpriseId: string, data: NewOven): Promise<Oven> {
     return this.gateway.create(enterpriseId, data);
+  }
+
+  async update(enterpriseId: string, id: number, data: OvenUpdate): Promise<Oven> {
+    return this.gateway.update(enterpriseId, id, data);
   }
 
   /** última manutenção = data da ordem finalizada; próxima = última + periodicidade. */

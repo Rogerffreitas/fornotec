@@ -14,7 +14,9 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "lang": "pt-BR",
+      "themeColor": "#F5F6F8"
     }
   }
 }
