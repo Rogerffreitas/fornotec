@@ -9,12 +9,15 @@ import { STORE_FIELD_MAX_LENGTH } from '../../../../domain/entities/Store';
 import { colors, spacing } from '../../../../components/theme';
 import { useAuth } from '@/context/AuthContext';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function NovaLoja() {
   const { user } = useAuth();
   const [description, setDescription] = useState('');
   const [address, setAddress] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactNumber, setContactNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -25,6 +28,10 @@ export default function NovaLoja() {
       setErro('Descrição e endereço são obrigatórios.');
       return;
     }
+    if (email.trim() && !EMAIL_REGEX.test(email.trim())) {
+      setErro('Informe um e-mail válido.');
+      return;
+    }
     setErro(null);
     setSalvando(true);
     try {
@@ -33,6 +40,7 @@ export default function NovaLoja() {
         address: address.trim(),
         contactName: contactName.trim() || undefined,
         contactNumber: contactNumber.trim() || undefined,
+        email: email.trim() || undefined,
       });
       router.back();
     } finally {
@@ -69,6 +77,15 @@ export default function NovaLoja() {
         onChangeText={setContactNumber}
         placeholder="(85) 99999-0000"
         keyboardType="phone-pad"
+        maxLength={STORE_FIELD_MAX_LENGTH}
+      />
+      <TextField
+        rotulo="E-mail do responsável"
+        value={email}
+        onChangeText={setEmail}
+        placeholder="loja@empresa.com"
+        keyboardType="email-address"
+        autoCapitalize="none"
         maxLength={STORE_FIELD_MAX_LENGTH}
       />
       {erro ? <Text style={{ color: colors.danger, marginBottom: spacing.md }}>{erro}</Text> : null}

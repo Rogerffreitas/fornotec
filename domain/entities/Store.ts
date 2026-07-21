@@ -9,6 +9,8 @@ export interface Store {
   contactName?: string;
   /** Opcional, máx. 100 caracteres. */
   contactNumber?: string;
+  /** Opcional, máx. 100 caracteres. */
+  email?: string;
 }
 
 export type NewStore = Omit<Store, 'id' | 'enterpriseId'>;

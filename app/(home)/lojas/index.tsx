@@ -52,7 +52,7 @@ export default function Lojas() {
           <ListRow
             titulo={item.description}
             subtitulo={item.address}
-            detalhes={[item.contactName, item.contactNumber].filter(Boolean).join(' · ')}
+            detalhes={[item.contactName, item.contactNumber, item.email].filter(Boolean).join(' · ')}
           />
         )}
       />
