@@ -13,6 +13,10 @@ export class MaintenanceInteractor implements MaintenanceUseCase {
     return this.gateway.findAll(enterpriseId);
   }
 
+  async findByOrder(enterpriseId: string, orderId: number): Promise<Maintenance[]> {
+    return this.gateway.findByOrder(enterpriseId, orderId);
+  }
+
   async findByOrderAndOven(
     enterpriseId: string,
     orderId: number,

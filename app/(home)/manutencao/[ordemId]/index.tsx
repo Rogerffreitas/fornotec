@@ -1,0 +1,160 @@
+import React, { useCallback, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { useLocalSearchParams, Stack } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
+import { Screen } from '../../../../components/Screen';
+import { PriorityChip } from '../../../../components/PriorityChip';
+import { WorkOrderStatusBadge } from '../../../../components/WorkOrderStatusBadge';
+import { ServiceTypeChip } from '../../../../components/ServiceTypeChip';
+import { EmptyState } from '../../../../components/EmptyState';
+import { WorkOrder } from '../../../../domain/entities/WorkOrder';
+import { Store } from '../../../../domain/entities/Store';
+import { Oven } from '../../../../domain/entities/Oven';
+import { Part } from '../../../../domain/entities/Part';
+import { Maintenance } from '../../../../domain/entities/Maintenance';
+import {
+  workOrderUseCase,
+  storeUseCase,
+  ovenUseCase,
+  partUseCase,
+  maintenanceUseCase,
+} from '../../../../infra/ioc/container';
+import { colors, spacing, radius } from '../../../../components/theme';
+import { useAuth } from '@/context/AuthContext';
+
+function formatarData(iso: string): string {
+  return new Date(iso).toLocaleDateString('pt-BR');
+}
+
+export default function ManutencaoDaOrdem() {
+  const { user } = useAuth();
+  const { ordemId } = useLocalSearchParams<{ ordemId: string }>();
+  const id = Number(ordemId);
+
+  const [ordem, setOrdem] = useState<WorkOrder | null>(null);
+  const [loja, setLoja] = useState<Store | null>(null);
+  const [fornosDaOrdem, setFornosDaOrdem] = useState<Oven[]>([]);
+  const [pecasPorId, setPecasPorId] = useState<Record<number, Part>>({});
+  const [manutencoesPorForno, setManutencoesPorForno] = useState<Record<number, Maintenance[]>>({});
+
+  const carregar = useCallback(async () => {
+    const enterpriseId = user!.enterpriseId;
+    const ordemAtual = await workOrderUseCase.findById(enterpriseId, id);
+    setOrdem(ordemAtual ?? null);
+    if (ordemAtual)
+      setLoja((await storeUseCase.findById(enterpriseId, ordemAtual.storeId)) ?? null);
+
+    const [orderOvens, manutencoes] = await Promise.all([
+      workOrderUseCase.findOvensOfOrder(enterpriseId, id),
+      maintenanceUseCase.findByOrder(enterpriseId, id),
+    ]);
+    const fornos = await Promise.all(
+      orderOvens.map((oo) => ovenUseCase.findById(enterpriseId, oo.ovenId)),
+    );
+    setFornosDaOrdem(fornos.filter((f): f is Oven => !!f));
+
+    const pecas = await partUseCase.findByIds(
+      enterpriseId,
+      manutencoes.map((m) => m.partId),
+    );
+    setPecasPorId(Object.fromEntries(pecas.map((p) => [p.id, p])));
+
+    const agrupado: Record<number, Maintenance[]> = {};
+    manutencoes.forEach((m) => {
+      (agrupado[m.ovenId] ??= []).push(m);
+    });
+    setManutencoesPorForno(agrupado);
+  }, [id, user]);
+
+  useFocusEffect(
+    useCallback(() => {
+      carregar();
+    }, [carregar]),
+  );
+
+  return (
+    <Screen>
+      <Stack.Screen options={{ title: `Manutenção OS #${id}` }} />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {ordem ? (
+          <View style={styles.resumo}>
+            <View>
+              <Text style={styles.resumoTitulo}>{loja?.description ?? ''}</Text>
+              <Text style={styles.resumoTexto}>{formatarData(ordem.createdAt)}</Text>
+            </View>
+            <View style={styles.badges}>
+              <PriorityChip prioridade={ordem.priority} />
+              <WorkOrderStatusBadge status={ordem.status} />
+            </View>
+          </View>
+        ) : null}
+
+        {fornosDaOrdem.length === 0 ? (
+          <EmptyState texto="Nenhum forno nesta ordem." />
+        ) : (
+          fornosDaOrdem.map((forno) => {
+            const itens = manutencoesPorForno[forno.id] ?? [];
+            return (
+              <View key={forno.id} style={styles.fornoBloco}>
+                <Text style={styles.secao}>
+                  {forno.assetNumber || 's/ patrimônio'} · {forno.description}
+                </Text>
+                {itens.length === 0 ? (
+                  <EmptyState texto="Nenhuma manutenção registrada neste forno." />
+                ) : (
+                  itens.map((item) => (
+                    <View key={item.id} style={styles.item}>
+                      <View style={styles.itemCabecalho}>
+                        <Text style={styles.itemTexto}>
+                          {pecasPorId[item.partId]?.reference ?? ''} ·{' '}
+                          {pecasPorId[item.partId]?.description ?? 'Peça'}
+                        </Text>
+                        <ServiceTypeChip tipo={item.serviceType} />
+                      </View>
+                      {item.observation ? (
+                        <Text style={styles.itemObs}>{item.observation}</Text>
+                      ) : null}
+                      <Text style={styles.itemData}>{formatarData(item.maintenanceDate)}</Text>
+                    </View>
+                  ))
+                )}
+              </View>
+            );
+          })
+        )}
+      </ScrollView>
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  resumo: {
+    marginBottom: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  resumoTitulo: { fontSize: 15, fontWeight: '600', color: colors.text },
+  resumoTexto: { fontSize: 13, color: colors.textSecondary, marginTop: 2 },
+  badges: { flexDirection: 'row', gap: spacing.xs },
+  fornoBloco: { marginBottom: spacing.lg },
+  secao: { fontSize: 13, fontWeight: '600', color: colors.textSecondary, marginBottom: spacing.sm },
+  item: {
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
+    padding: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  itemCabecalho: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  itemTexto: { fontSize: 13, fontWeight: '600', color: colors.text, flexShrink: 1 },
+  itemObs: { fontSize: 12, color: colors.textSecondary, marginTop: 4 },
+  itemData: { fontSize: 11, color: colors.textSecondary, marginTop: 4 },
+});

@@ -15,6 +15,13 @@ export class MaintenanceRepositoryGatewayApi implements MaintenanceRepositoryGat
     return this.http.get<Maintenance[]>('/maintenances', { headers: authHeader() });
   }
 
+  async findByOrder(_enterpriseId: string, orderId: number): Promise<Maintenance[]> {
+    return this.http.get<Maintenance[]>('/maintenances', {
+      headers: authHeader(),
+      params: { orderId },
+    });
+  }
+
   async findByOrderAndOven(
     _enterpriseId: string,
     orderId: number,

@@ -48,7 +48,7 @@ export default function NovaManutencao() {
       workOrderUseCase.findAll(user!.enterpriseId),
       storeUseCase.findAll(user!.enterpriseId),
     ]).then(([listaOrdens, lojas]) => {
-      setOrdens(listaOrdens);
+      setOrdens(listaOrdens.filter((o) => o.status === 'pendente'));
       setLojasPorId(Object.fromEntries(lojas.map((l) => [l.id, l])));
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,7 +109,7 @@ export default function NovaManutencao() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.secao}>Ordem de serviço</Text>
         {ordens.length === 0 ? (
-          <EmptyState texto="Nenhuma ordem de serviço cadastrada ainda." />
+          <EmptyState texto="Nenhuma ordem de serviço em aberto." />
         ) : (
           <View style={styles.chips}>
             {ordens.map((ordem) => (

@@ -13,6 +13,12 @@ export class MaintenanceRepositoryGatewayImpl implements MaintenanceRepositoryGa
     return delay(maintenances.filter((m) => m.enterpriseId === enterpriseId));
   }
 
+  async findByOrder(enterpriseId: string, orderId: number): Promise<Maintenance[]> {
+    return delay(
+      maintenances.filter((m) => m.enterpriseId === enterpriseId && m.orderId === orderId),
+    );
+  }
+
   async findByOrderAndOven(
     enterpriseId: string,
     orderId: number,
