@@ -70,7 +70,6 @@ describe('buildWorkOrderPdfDocument', () => {
       ordem,
       loja,
       enterpriseName: 'Forno Tec Demo',
-      tecnico: 'João Técnico',
       pecas: [peca],
       itens: [{ orderOven, oven, manutencoes: [manutencao] }],
     });
@@ -78,7 +77,8 @@ describe('buildWorkOrderPdfDocument', () => {
     expect(documento.title).toBe('Ordem de Serviço #42');
     expect(documento.infoBox).toEqual(
       expect.arrayContaining([
-        { label: 'Loja', value: 'Loja Centro — Rua A, 123' },
+        { label: 'Loja', value: 'Loja Centro' },
+        { label: 'Endereço', value: 'Rua A, 123' },
         { label: 'Status', value: 'Pendente' },
         { label: 'Prioridade', value: 'Alta' },
       ]),
@@ -100,7 +100,6 @@ describe('buildWorkOrderPdfDocument', () => {
       ordem,
       loja,
       enterpriseName: 'Forno Tec Demo',
-      tecnico: 'João Técnico',
       pecas: [],
       itens: [{ orderOven, oven, manutencoes: [] }],
     });
@@ -116,7 +115,6 @@ describe('buildWorkOrderPdfDocument', () => {
       ordem,
       loja: null,
       enterpriseName: 'Forno Tec Demo',
-      tecnico: 'João Técnico',
       pecas: [],
       itens: [],
     });

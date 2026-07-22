@@ -17,7 +17,6 @@ export interface WorkOrderPdfTemplateParams {
   ordem: WorkOrder;
   loja: Store | null;
   enterpriseName: string;
-  tecnico: string;
   itens: WorkOrderPdfOvenItem[];
   /** Peças referenciadas pelas manutenções de `itens`, usadas para resolver `partId` -> descrição/referência. */
   pecas: Part[];
@@ -72,8 +71,8 @@ export function buildWorkOrderPdfDocument(params: WorkOrderPdfTemplateParams): D
   const { ordem, loja, itens, pecas } = params;
 
   const infoBox = [
-    
-    { label: 'Loja', value: loja ? `${loja.description} — ${loja.address}` : 'Não encontrada' },
+    { label: 'Loja', value: loja ? loja.description : 'Não encontrada' },
+    ...(loja ? [{ label: 'Endereço', value: loja.address }] : []),
     ...(loja?.contactName || loja?.contactNumber
       ? [
           {

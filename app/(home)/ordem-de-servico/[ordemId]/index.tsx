@@ -97,7 +97,6 @@ export default function DetalheOrdem() {
         ordem,
         loja,
         enterpriseName: user!.enterpriseName,
-        tecnico: user!.name,
         pecas,
         itens: itens.map(({ orderOven, oven }) => ({
           orderOven,
