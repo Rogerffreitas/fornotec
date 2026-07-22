@@ -55,14 +55,14 @@ function buildOrderOven(overrides: Partial<WorkOrderOven> = {}): WorkOrderOven {
 }
 
 describe('WorkOrderInteractor.findWithFilter', () => {
-  it('returns every order when no storeId is given', async () => {
+  it('returns every order sorted by most recent first when no storeId is given', async () => {
     const orders = [buildOrder({ id: 1, storeId: 1 }), buildOrder({ id: 2, storeId: 2 })];
     const gateway = makeGateway({ findAll: jest.fn().mockResolvedValue(orders) });
     const interactor = new WorkOrderInteractor(gateway, makeOvenUseCase());
 
     const result = await interactor.findWithFilter('ent-1');
 
-    expect(result).toEqual(orders);
+    expect(result).toEqual([buildOrder({ id: 2, storeId: 2 }), buildOrder({ id: 1, storeId: 1 })]);
   });
 
   it('filters orders by storeId', async () => {
@@ -73,6 +73,20 @@ describe('WorkOrderInteractor.findWithFilter', () => {
     const result = await interactor.findWithFilter('ent-1', 2);
 
     expect(result).toEqual([buildOrder({ id: 2, storeId: 2 })]);
+  });
+
+  it('sorts by createdAt descending, using id as a tiebreaker', async () => {
+    const orders = [
+      buildOrder({ id: 1, createdAt: '2026-07-18T00:00:00.000Z' }),
+      buildOrder({ id: 3, createdAt: '2026-07-20T00:00:00.000Z' }),
+      buildOrder({ id: 2, createdAt: '2026-07-20T00:00:00.000Z' }),
+    ];
+    const gateway = makeGateway({ findAll: jest.fn().mockResolvedValue(orders) });
+    const interactor = new WorkOrderInteractor(gateway, makeOvenUseCase());
+
+    const result = await interactor.findWithFilter('ent-1');
+
+    expect(result.map((o) => o.id)).toEqual([3, 2, 1]);
   });
 });
 

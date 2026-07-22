@@ -16,8 +16,10 @@ export class WorkOrderInteractor implements WorkOrderUseCase {
 
   async findWithFilter(enterpriseId: string, storeId?: number): Promise<WorkOrder[]> {
     const all = await this.gateway.findAll(enterpriseId);
-    if (!storeId) return all;
-    return all.filter((o) => o.storeId === storeId);
+    const filtered = storeId ? all.filter((o) => o.storeId === storeId) : all;
+    return [...filtered].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime() || b.id - a.id,
+    );
   }
 
   async findById(enterpriseId: string, id: number): Promise<WorkOrder | undefined> {
