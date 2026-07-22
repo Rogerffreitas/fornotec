@@ -27,4 +27,5 @@ export interface MaintenanceRepositoryGateway {
   findByOrderAndOven(enterpriseId: string, orderId: number, ovenId: number): Promise<Maintenance[]>;
   findPage(enterpriseId: string, filters: MaintenanceFilters): Promise<MaintenancePage>;
   createMany(enterpriseId: string, data: CreateMaintenanceInput[]): Promise<Maintenance[]>;
+  remove(enterpriseId: string, id: number): Promise<void>;
 }

@@ -47,4 +47,8 @@ export class MaintenanceInteractor implements MaintenanceUseCase {
       })),
     );
   }
+
+  async remove(enterpriseId: string, id: number): Promise<void> {
+    return this.gateway.remove(enterpriseId, id);
+  }
 }

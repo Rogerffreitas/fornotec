@@ -114,3 +114,14 @@ describe('MaintenanceRepositoryGatewayApi.createMany', () => {
     );
   });
 });
+
+describe('MaintenanceRepositoryGatewayApi.remove', () => {
+  it('deletes /maintenances/:id with the auth header', async () => {
+    const http = makeHttpClient({ delete: jest.fn().mockResolvedValue(undefined) });
+    const gateway = new MaintenanceRepositoryGatewayApi(http);
+
+    await gateway.remove('ent-1', 5);
+
+    expect(http.delete).toHaveBeenCalledWith('/maintenances/5', { headers: authHeader() });
+  });
+});

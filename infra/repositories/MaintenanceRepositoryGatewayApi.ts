@@ -63,4 +63,8 @@ export class MaintenanceRepositoryGatewayApi implements MaintenanceRepositoryGat
       { headers: authHeader() },
     );
   }
+
+  async remove(_enterpriseId: string, id: number): Promise<void> {
+    await this.http.delete<void>(`/maintenances/${id}`, { headers: authHeader() });
+  }
 }

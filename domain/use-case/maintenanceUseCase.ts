@@ -12,4 +12,5 @@ export interface MaintenanceUseCase {
     ovenId: number,
     items: NewMaintenanceItem[],
   ): Promise<Maintenance[]>;
+  remove(enterpriseId: string, id: number): Promise<void>;
 }

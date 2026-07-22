@@ -64,4 +64,10 @@ export class MaintenanceRepositoryGatewayImpl implements MaintenanceRepositoryGa
     maintenances.push(...created);
     return delay(created);
   }
+
+  async remove(enterpriseId: string, id: number): Promise<void> {
+    const index = maintenances.findIndex((m) => m.enterpriseId === enterpriseId && m.id === id);
+    if (index !== -1) maintenances.splice(index, 1);
+    return delay(undefined);
+  }
 }

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, ScrollView, Platform, Alert, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, Platform, Alert, StyleSheet } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../../../../components/Screen';
@@ -30,6 +30,19 @@ function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR');
 }
 
+/** Alert.alert não exibe nada na web (react-native-web só tem um stub vazio) — por isso o confirm nativo do browser ali. */
+function confirmarExclusao(): Promise<boolean> {
+  if (Platform.OS === 'web') {
+    return Promise.resolve(window.confirm('Excluir esta manutenção? Esta ação não pode ser desfeita.'));
+  }
+  return new Promise((resolve) => {
+    Alert.alert('Excluir manutenção', 'Esta ação não pode ser desfeita.', [
+      { text: 'Cancelar', style: 'cancel', onPress: () => resolve(false) },
+      { text: 'Excluir', style: 'destructive', onPress: () => resolve(true) },
+    ]);
+  });
+}
+
 export default function ManutencaoDaOrdem() {
   const { user } = useAuth();
   const { ordemId } = useLocalSearchParams<{ ordemId: string }>();
@@ -41,6 +54,7 @@ export default function ManutencaoDaOrdem() {
   const [pecasPorId, setPecasPorId] = useState<Record<number, Part>>({});
   const [manutencoesPorForno, setManutencoesPorForno] = useState<Record<number, Maintenance[]>>({});
   const [gerandoRelatorio, setGerandoRelatorio] = useState(false);
+  const [excluindoId, setExcluindoId] = useState<number | null>(null);
 
   const carregar = useCallback(async () => {
     const enterpriseId = user!.enterpriseId;
@@ -76,6 +90,17 @@ export default function ManutencaoDaOrdem() {
       carregar();
     }, [carregar]),
   );
+
+  async function excluir(item: Maintenance) {
+    if (!(await confirmarExclusao())) return;
+    setExcluindoId(item.id);
+    try {
+      await maintenanceUseCase.remove(user!.enterpriseId, item.id);
+      await carregar();
+    } finally {
+      setExcluindoId(null);
+    }
+  }
 
   async function baixarRelatorio() {
     if (fornosDaOrdem.length === 0) return;
@@ -169,7 +194,18 @@ export default function ManutencaoDaOrdem() {
                       {item.observation ? (
                         <Text style={styles.itemObs}>{item.observation}</Text>
                       ) : null}
-                      <Text style={styles.itemData}>{formatarData(item.maintenanceDate)}</Text>
+                      <View style={styles.itemRodape}>
+                        <Text style={styles.itemData}>{formatarData(item.maintenanceDate)}</Text>
+                        <Pressable
+                          onPress={() => excluir(item)}
+                          disabled={excluindoId === item.id}
+                          hitSlop={8}
+                        >
+                          <Text style={styles.itemExcluir}>
+                            {excluindoId === item.id ? 'Excluindo…' : 'Excluir'}
+                          </Text>
+                        </Pressable>
+                      </View>
                     </View>
                   ))
                 )}
@@ -211,5 +247,12 @@ const styles = StyleSheet.create({
   },
   itemTexto: { fontSize: 13, fontWeight: '600', color: colors.text, flexShrink: 1 },
   itemObs: { fontSize: 12, color: colors.textSecondary, marginTop: 4 },
-  itemData: { fontSize: 11, color: colors.textSecondary, marginTop: 4 },
+  itemRodape: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 4,
+  },
+  itemData: { fontSize: 11, color: colors.textSecondary },
+  itemExcluir: { fontSize: 11, fontWeight: '600', color: colors.danger },
 });

@@ -11,6 +11,7 @@ function makeGateway(
     findByOrderAndOven: jest.fn(),
     findPage: jest.fn(),
     createMany: jest.fn(),
+    remove: jest.fn(),
     ...overrides,
   } as jest.Mocked<MaintenanceRepositoryGateway>;
 }
@@ -99,5 +100,16 @@ describe('MaintenanceInteractor.register', () => {
     ]);
 
     expect(result).toEqual(created);
+  });
+});
+
+describe('MaintenanceInteractor.remove', () => {
+  it('delegates to the gateway with the enterpriseId and id', async () => {
+    const gateway = makeGateway({ remove: jest.fn().mockResolvedValue(undefined) });
+    const interactor = new MaintenanceInteractor(gateway);
+
+    await interactor.remove('ent-1', 42);
+
+    expect(gateway.remove).toHaveBeenCalledWith('ent-1', 42);
   });
 });
