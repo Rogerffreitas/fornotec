@@ -26,7 +26,10 @@ export class FetchHttpClientAdapter implements HttpClient {
     if (!response.ok) {
       throw new HttpError(response.status, url);
     }
-    return (await response.json()) as T;
+    // DELETE (e outras respostas sem corpo) chegam com texto vazio — response.json() quebraria com
+    // "Unexpected end of JSON input" nesse caso.
+    const text = await response.text();
+    return (text ? JSON.parse(text) : undefined) as T;
   }
 
   get<T>(url: string, config?: HttpRequestConfig): Promise<T> {
