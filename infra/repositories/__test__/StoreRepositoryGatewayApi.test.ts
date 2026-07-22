@@ -67,3 +67,17 @@ describe('StoreRepositoryGatewayApi.create', () => {
     expect(result).toBe(created);
   });
 });
+
+describe('StoreRepositoryGatewayApi.update', () => {
+  it('patches the edited fields to /stores/:id', async () => {
+    const updated = { id: 1, description: 'Loja Renovada' };
+    const http = makeHttpClient({ patch: jest.fn().mockResolvedValue(updated) });
+    const gateway = new StoreRepositoryGatewayApi(http);
+
+    const data = { description: 'Loja Renovada', address: 'Rua X, 1' };
+    const result = await gateway.update('ent-1', 1, data);
+
+    expect(http.patch).toHaveBeenCalledWith('/stores/1', data, { headers: authHeader() });
+    expect(result).toBe(updated);
+  });
+});

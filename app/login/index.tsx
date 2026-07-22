@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { Screen } from '../../components/Screen';
 import { TextField } from '../../components/TextField';
 import { PrimaryButton } from '../../components/PrimaryButton';
 import { RoleToggle, LoginRole, LOGIN_ROLE_TO_ROLE } from '../../components/RoleToggle';
-import { colors, spacing } from '../../components/theme';
+import { colors, spacing, radius } from '../../components/theme';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Login() {
@@ -22,6 +22,15 @@ export default function Login() {
   return (
     <Screen>
       <View style={styles.centro}>
+        <View style={styles.marca}>
+          <Image
+            source={require('../../assets/images/logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.wordmark}>Fornotec</Text>
+        </View>
+
         <Text style={styles.titulo}>Gestão de Fornos</Text>
         <Text style={styles.subtitulo}>Escolha seu perfil e entre com usuário e senha</Text>
 
@@ -53,6 +62,22 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   centro: { flex: 1, justifyContent: 'center' },
+  marca: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.brand,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.lg,
+    marginBottom: spacing.lg,
+  },
+  logo: { width: 26, height: 37 },
+  wordmark: { fontSize: 24, fontWeight: '800', color: colors.primary },
   titulo: { fontSize: 24, fontWeight: '700', color: colors.text, textAlign: 'center' },
   subtitulo: {
     fontSize: 14,

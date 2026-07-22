@@ -15,4 +15,6 @@ export interface Store {
 
 export type NewStore = Omit<Store, 'id' | 'enterpriseId'>;
 
+export type StoreUpdate = NewStore;
+
 export const STORE_FIELD_MAX_LENGTH = 100;

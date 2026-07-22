@@ -17,7 +17,6 @@ export interface WorkOrderPdfTemplateParams {
   ordem: WorkOrder;
   loja: Store | null;
   enterpriseName: string;
-  tecnico: string;
   itens: WorkOrderPdfOvenItem[];
   /** Peças referenciadas pelas manutenções de `itens`, usadas para resolver `partId` -> descrição/referência. */
   pecas: Part[];
@@ -69,11 +68,11 @@ function linhasManutencao(manutencoes: Maintenance[], pecas: Part[]): string[][]
  * detalhe da ordem (`app/(home)/ordem-de-servico/[ordemId]/index.tsx`).
  */
 export function buildWorkOrderPdfDocument(params: WorkOrderPdfTemplateParams): DocumentDefinitions {
-  const { ordem, loja, tecnico, itens, pecas } = params;
+  const { ordem, loja, itens, pecas } = params;
 
   const infoBox = [
-    
-    { label: 'Loja', value: loja ? `${loja.description} — ${loja.address}` : 'Não encontrada' },
+    { label: 'Loja', value: loja ? loja.description : 'Não encontrada' },
+    ...(loja ? [{ label: 'Endereço', value: loja.address }] : []),
     ...(loja?.contactName || loja?.contactNumber
       ? [
           {
@@ -82,7 +81,7 @@ export function buildWorkOrderPdfDocument(params: WorkOrderPdfTemplateParams): D
           },
         ]
       : []),
-    { label: 'Técnico responsável', value: tecnico },
+    
     { label: 'Data de abertura', value: formatarData(ordem.createdAt) },
     { label: 'Status', value: STATUS_LABELS[ordem.status] },
     { label: 'Prioridade', value: WORK_ORDER_PRIORITY_LABELS[ordem.priority] },

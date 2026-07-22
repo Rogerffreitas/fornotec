@@ -9,6 +9,7 @@ function makeGateway(
     findAll: jest.fn(),
     findById: jest.fn(),
     create: jest.fn(),
+    update: jest.fn(),
     ...overrides,
   } as jest.Mocked<StoreRepositoryGateway>;
 }
@@ -59,5 +60,19 @@ describe('StoreInteractor.create', () => {
 
     expect(gateway.create).toHaveBeenCalledWith('ent-1', data);
     expect(result).toEqual(created);
+  });
+});
+
+describe('StoreInteractor.update', () => {
+  it('delegates to the gateway with the given id and data', async () => {
+    const updated = buildStore({ description: 'Loja Renovada' });
+    const gateway = makeGateway({ update: jest.fn().mockResolvedValue(updated) });
+    const interactor = new StoreInteractor(gateway);
+
+    const data = { description: 'Loja Renovada', address: 'Av. Principal, 100' };
+    const result = await interactor.update('ent-1', 1, data);
+
+    expect(gateway.update).toHaveBeenCalledWith('ent-1', 1, data);
+    expect(result).toEqual(updated);
   });
 });

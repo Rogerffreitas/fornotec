@@ -37,12 +37,12 @@ function RootLayoutNav() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
         <Stack
           screenOptions={{
-            headerStyle: { backgroundColor: colors.card },
-            headerTitleStyle: { fontWeight: '600', color: colors.text },
-            headerTintColor: colors.primary,
+            headerStyle: { backgroundColor: colors.brand },
+            headerTitleStyle: { fontWeight: '600', color: '#FFFFFF' },
+            headerTintColor: '#FFFFFF',
             headerShadowVisible: false,
             contentStyle: { backgroundColor: colors.background },
             headerShown: false,
