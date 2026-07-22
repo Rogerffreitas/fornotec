@@ -18,6 +18,7 @@ export default function Home() {
         <Stack.Screen name="fornos/index" options={{ title: 'Fornos' }} />
         <Stack.Screen name="fornos/novo-forno/index" options={{ title: 'Cadastrar Forno' }} />
         <Stack.Screen name="lojas/index" options={{ title: 'Lojas' }} />
+        <Stack.Screen name="lojas/nova-loja/index" options={{ title: 'Cadastrar Loja' }} />
         <Stack.Screen name="manutencao/index" options={{ title: 'Manutenção' }} />
         <Stack.Screen name="ordem-de-servico/index" options={{ title: 'Ordem de Serviço' }} />
         <Stack.Screen name="pecas/index" options={{ title: 'Peças' }} />
