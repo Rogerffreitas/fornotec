@@ -42,7 +42,7 @@ export default function Login() {
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
-            placeholder="admin"
+            placeholder="usuário"
           />
           <TextField
             rotulo="Senha"
