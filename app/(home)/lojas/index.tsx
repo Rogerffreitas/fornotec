@@ -53,6 +53,7 @@ export default function Lojas() {
             titulo={item.description}
             subtitulo={item.address}
             detalhes={[item.contactName, item.contactNumber, item.email].filter(Boolean).join(' · ')}
+            onPress={() => router.push(`/lojas/${item.id}`)}
           />
         )}
       />

@@ -22,6 +22,7 @@ import {
 } from '../../../../infra/ioc/container';
 import { buildWorkOrderPdfDocument } from '../../../../infra/pdf/templates/workOrderPdfTemplate';
 import { baixarPdfNaWeb } from '../../../../infra/pdf/baixarPdfNaWeb';
+import { podeGerenciarOrdem } from '../../../../domain/types/permissions';
 import { colors, spacing } from '../../../../components/theme';
 import { useAuth } from '@/context/AuthContext';
 
@@ -118,6 +119,8 @@ export default function DetalheOrdem() {
     }
   }
 
+  const podeGerenciar = podeGerenciarOrdem(user!.role);
+
   return (
     <Screen>
       <Stack.Screen options={{ title: `OS #${id}` }} />
@@ -141,8 +144,12 @@ export default function DetalheOrdem() {
             key={orderOven.id}
             titulo={`${oven.assetNumber || 's/ patrimônio'} · ${oven.description}`}
             subtitulo={orderOven.observation}
-            detalhes="Toque para registrar manutenção neste forno"
-            onPress={() => router.push(`/ordem-de-servico/${id}/forno/${oven.id}`)}
+            detalhes={podeGerenciar ? 'Toque para registrar manutenção neste forno' : undefined}
+            onPress={
+              podeGerenciar
+                ? () => router.push(`/ordem-de-servico/${id}/forno/${oven.id}`)
+                : undefined
+            }
           />
         ))
       )}
@@ -157,12 +164,14 @@ export default function DetalheOrdem() {
 
       {ordem?.status === 'pendente' ? (
         <View style={styles.acoes}>
-          <PrimaryButton
-            titulo="Finalizar ordem"
-            onPress={finalizar}
-            carregando={finalizando}
-            style={{ flex: 1 }}
-          />
+          {podeGerenciar ? (
+            <PrimaryButton
+              titulo="Finalizar ordem"
+              onPress={finalizar}
+              carregando={finalizando}
+              style={{ flex: 1 }}
+            />
+          ) : null}
           <PrimaryButton
             titulo="Cancelar ordem"
             variante="perigo"

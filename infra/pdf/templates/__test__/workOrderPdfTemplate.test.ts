@@ -79,7 +79,6 @@ describe('buildWorkOrderPdfDocument', () => {
     expect(documento.infoBox).toEqual(
       expect.arrayContaining([
         { label: 'Loja', value: 'Loja Centro — Rua A, 123' },
-        { label: 'Técnico responsável', value: 'João Técnico' },
         { label: 'Status', value: 'Pendente' },
         { label: 'Prioridade', value: 'Alta' },
       ]),

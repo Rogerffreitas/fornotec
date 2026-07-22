@@ -69,7 +69,7 @@ function linhasManutencao(manutencoes: Maintenance[], pecas: Part[]): string[][]
  * detalhe da ordem (`app/(home)/ordem-de-servico/[ordemId]/index.tsx`).
  */
 export function buildWorkOrderPdfDocument(params: WorkOrderPdfTemplateParams): DocumentDefinitions {
-  const { ordem, loja, tecnico, itens, pecas } = params;
+  const { ordem, loja, itens, pecas } = params;
 
   const infoBox = [
     
@@ -82,7 +82,7 @@ export function buildWorkOrderPdfDocument(params: WorkOrderPdfTemplateParams): D
           },
         ]
       : []),
-    { label: 'Técnico responsável', value: tecnico },
+    
     { label: 'Data de abertura', value: formatarData(ordem.createdAt) },
     { label: 'Status', value: STATUS_LABELS[ordem.status] },
     { label: 'Prioridade', value: WORK_ORDER_PRIORITY_LABELS[ordem.priority] },

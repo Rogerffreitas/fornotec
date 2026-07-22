@@ -1,5 +1,5 @@
 import { StoreRepositoryGateway } from '../../domain/application/gateway/StoreRepositoryGateway';
-import { Store, NewStore } from '../../domain/entities/Store';
+import { Store, NewStore, StoreUpdate } from '../../domain/entities/Store';
 import { stores } from './seed';
 import { delay, nextId } from './utils';
 
@@ -15,6 +15,13 @@ export class StoreRepositoryGatewayImpl implements StoreRepositoryGateway {
   async create(enterpriseId: string, data: NewStore): Promise<Store> {
     const store: Store = { id: nextId(stores), enterpriseId, ...data };
     stores.push(store);
+    return delay(store);
+  }
+
+  async update(enterpriseId: string, id: number, data: StoreUpdate): Promise<Store> {
+    const store = stores.find((s) => s.id === id && s.enterpriseId === enterpriseId);
+    if (!store) throw new Error(`Loja ${id} não encontrada`);
+    Object.assign(store, data);
     return delay(store);
   }
 }

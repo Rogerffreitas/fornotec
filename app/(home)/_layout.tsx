@@ -1,14 +1,20 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Redirect, Stack } from 'expo-router';
+import { Redirect, Stack, usePathname } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
-
+import { moduloDaRota, podeAcessarModulo } from '../../domain/types/permissions';
 
 export default function Home() {
   const { user } = useAuth();
+  const pathname = usePathname();
 
   if (!user) {
     return <Redirect href="/login" />;
+  }
+
+  const modulo = moduloDaRota(pathname);
+  if (modulo && !podeAcessarModulo(user.role, modulo)) {
+    return <Redirect href="/" />;
   }
 
   return (
@@ -17,8 +23,10 @@ export default function Home() {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="fornos/index" options={{ title: 'Fornos' }} />
         <Stack.Screen name="fornos/novo-forno/index" options={{ title: 'Cadastrar Forno' }} />
+        <Stack.Screen name="fornos/[fornoId]/index" options={{ title: 'Editar Forno' }} />
         <Stack.Screen name="lojas/index" options={{ title: 'Lojas' }} />
         <Stack.Screen name="lojas/nova-loja/index" options={{ title: 'Cadastrar Loja' }} />
+        <Stack.Screen name="lojas/[lojaId]/index" options={{ title: 'Editar Loja' }} />
         <Stack.Screen name="manutencao/index" options={{ title: 'Manutenção' }} />
         <Stack.Screen name="ordem-de-servico/index" options={{ title: 'Ordem de Serviço' }} />
         <Stack.Screen name="pecas/index" options={{ title: 'Peças' }} />

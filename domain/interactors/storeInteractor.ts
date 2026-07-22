@@ -1,6 +1,6 @@
 import { StoreUseCase } from '../use-case/storeUseCase';
 import { StoreRepositoryGateway } from '../application/gateway/StoreRepositoryGateway';
-import { Store, NewStore } from '../entities/Store';
+import { Store, NewStore, StoreUpdate } from '../entities/Store';
 
 export class StoreInteractor implements StoreUseCase {
   constructor(private readonly gateway: StoreRepositoryGateway) {}
@@ -22,5 +22,9 @@ export class StoreInteractor implements StoreUseCase {
 
   async create(enterpriseId: string, data: NewStore): Promise<Store> {
     return this.gateway.create(enterpriseId, data);
+  }
+
+  async update(enterpriseId: string, id: number, data: StoreUpdate): Promise<Store> {
+    return this.gateway.update(enterpriseId, id, data);
   }
 }

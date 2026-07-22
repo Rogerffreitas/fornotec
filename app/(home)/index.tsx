@@ -4,22 +4,35 @@ import { router } from 'expo-router';
 import { Screen } from '../../components/Screen';
 import { useAuth } from '../../context/AuthContext';
 import { colors, spacing, radius } from '../../components/theme';
+import { Modulo, podeAcessarModulo } from '../../domain/types/permissions';
 
-const MODULOS: { titulo: string; descricao: string; rota: string }[] = [
-  { titulo: 'Lojas', descricao: 'Cadastro de lojas', rota: '/lojas' },
+const MODULOS: { titulo: string; descricao: string; rota: string; modulo: Modulo }[] = [
+  { titulo: 'Lojas', descricao: 'Cadastro de lojas', rota: '/lojas', modulo: 'lojas' },
   {
     titulo: 'Ordens de Serviço',
     descricao: 'Abrir e acompanhar ordens',
     rota: '/ordem-de-servico',
+    modulo: 'ordem-de-servico',
   },
-  { titulo: 'Peças', descricao: 'Cadastro de peças', rota: '/pecas' },
-  { titulo: 'Fornos', descricao: 'Cadastro de fornos por loja', rota: '/fornos' },
-  { titulo: 'Peças do Forno', descricao: 'Associar peças aos fornos', rota: '/pecas-forno' },
-  { titulo: 'Manutenções', descricao: 'Histórico de manutenções', rota: '/manutencao' },
+  { titulo: 'Peças', descricao: 'Cadastro de peças', rota: '/pecas', modulo: 'pecas' },
+  { titulo: 'Fornos', descricao: 'Cadastro de fornos por loja', rota: '/fornos', modulo: 'fornos' },
+  {
+    titulo: 'Peças do Forno',
+    descricao: 'Associar peças aos fornos',
+    rota: '/pecas-forno',
+    modulo: 'pecas-forno',
+  },
+  {
+    titulo: 'Manutenções',
+    descricao: 'Histórico de manutenções',
+    rota: '/manutencao',
+    modulo: 'manutencao',
+  },
 ];
 
 export default function Home() {
   const { user, logout } = useAuth();
+  const modulosVisiveis = MODULOS.filter((m) => podeAcessarModulo(user!.role, m.modulo));
 
   return (
     <Screen>
@@ -45,7 +58,7 @@ export default function Home() {
       </View>
 
       <View style={styles.grade}>
-        {MODULOS.map((m) => (
+        {modulosVisiveis.map((m) => (
           <Pressable
             key={m.rota}
             style={({ pressed }) => [styles.card, pressed && styles.cardPressionado]}
