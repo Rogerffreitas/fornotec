@@ -59,23 +59,27 @@ export default function PecasDoForno() {
 
   return (
     <Screen>
-      <Text style={styles.secao}>Peças já cadastradas neste forno</Text>
-      {pecasJaLigadas.length === 0 ? (
-        <EmptyState texto="Nenhuma peça associada ainda." />
-      ) : (
-        pecasJaLigadas.map((p) => (
-          <View key={p.id} style={styles.linhaLigada}>
-            <Text style={styles.linhaLigadaTexto}>
-              {p.reference} · {p.description}
-            </Text>
-          </View>
-        ))
-      )}
-
-      <Text style={[styles.secao, { marginTop: spacing.lg }]}>Adicionar peças</Text>
       <FlatList
+        style={styles.lista}
         data={pecasDisponiveis}
         keyExtractor={(item) => String(item.id)}
+        ListHeaderComponent={
+          <>
+            <Text style={styles.secao}>Peças já cadastradas neste forno</Text>
+            {pecasJaLigadas.length === 0 ? (
+              <EmptyState texto="Nenhuma peça associada ainda." />
+            ) : (
+              pecasJaLigadas.map((p) => (
+                <View key={p.id} style={styles.linhaLigada}>
+                  <Text style={styles.linhaLigadaTexto}>
+                    {p.reference} · {p.description}
+                  </Text>
+                </View>
+              ))
+            )}
+            <Text style={[styles.secao, { marginTop: spacing.lg }]}>Adicionar peças</Text>
+          </>
+        }
         ListEmptyComponent={<EmptyState texto="Todas as peças cadastradas já estão neste forno." />}
         renderItem={({ item }) => {
           const marcada = selecionadas.includes(item.id);
@@ -108,6 +112,7 @@ export default function PecasDoForno() {
 }
 
 const styles = StyleSheet.create({
+  lista: { flex: 1 },
   secao: { fontSize: 13, fontWeight: '600', color: colors.textSecondary, marginBottom: spacing.sm },
   linhaLigada: {
     backgroundColor: colors.highlight,
