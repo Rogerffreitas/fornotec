@@ -1,7 +1,7 @@
 import { Asset } from 'expo-asset';
 import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from 'pdf-lib';
 import { PdfGenerator } from '../../domain/application/infra/PdfGenerator';
-import { DocumentDefinitions } from '../../domain/application/infra/DocumentDefinitions';
+import { DocumentDefinitions, DocumentSignatureBlock } from '../../domain/application/infra/DocumentDefinitions';
 
 const LOGO_MODULE = require('../../assets/images/logo.png');
 
@@ -249,6 +249,47 @@ export class PdfLibPdfGenerator implements PdfGenerator {
       y -= 10;
     };
 
+    const drawSignatureBlock = (block: DocumentSignatureBlock) => {
+      const boxWidth = 220;
+      const boxHeight = 70;
+      ensureSpace(boxHeight + 3 * LINE_HEIGHT);
+
+      page.drawRectangle({
+        x: MARGIN,
+        y: y - boxHeight,
+        width: boxWidth,
+        height: boxHeight,
+        borderColor: GRAY_BORDER,
+        borderWidth: 0.75,
+      });
+
+      const scale = Math.min(
+        block.strokesWidth > 0 ? boxWidth / block.strokesWidth : 1,
+        block.strokesHeight > 0 ? boxHeight / block.strokesHeight : 1,
+      );
+      const drawnWidth = block.strokesWidth * scale;
+      const drawnHeight = block.strokesHeight * scale;
+      const offsetX = MARGIN + (boxWidth - drawnWidth) / 2;
+      const offsetY = y - boxHeight + (boxHeight - drawnHeight) / 2;
+
+      for (const stroke of block.strokes) {
+        for (let i = 1; i < stroke.length; i++) {
+          const p1 = stroke[i - 1];
+          const p2 = stroke[i];
+          page.drawLine({
+            start: { x: offsetX + p1.x * scale, y: offsetY + drawnHeight - p1.y * scale },
+            end: { x: offsetX + p2.x * scale, y: offsetY + drawnHeight - p2.y * scale },
+            thickness: 1,
+            color: TEXT_DARK,
+          });
+        }
+      }
+
+      y -= boxHeight + LINE_HEIGHT;
+      drawLine(block.label, { size: 10, color: TEXT_MUTED });
+      drawLine(`Nome: ${block.name}`, { size: 10, bold: true });
+    };
+
     newPage();
 
     if (definitions.infoBox?.length) {
@@ -267,6 +308,11 @@ export class PdfLibPdfGenerator implements PdfGenerator {
       if (section.table) {
         drawTable(section.table.columns, section.table.rows);
       }
+    }
+
+    if (definitions.signatureBlock) {
+      y -= 10;
+      drawSignatureBlock(definitions.signatureBlock);
     }
 
     if (definitions.footerLines?.length) {

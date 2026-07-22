@@ -125,9 +125,10 @@ describe('WorkOrderInteractor.finalize', () => {
     });
     const interactor = new WorkOrderInteractor(gateway, ovenUseCase);
 
-    const result = await interactor.finalize('ent-1', 3);
+    const assinatura = { nome: 'Maria Cliente', tracos: [[{ x: 0, y: 0 }]], largura: 300, altura: 150 };
+    const result = await interactor.finalize('ent-1', 3, assinatura);
 
-    expect(gateway.updateStatus).toHaveBeenCalledWith('ent-1', 3, 'finalizada');
+    expect(gateway.updateStatus).toHaveBeenCalledWith('ent-1', 3, 'finalizada', assinatura);
     expect(ovenUseCase.registerCompletedMaintenance).toHaveBeenCalledWith(
       'ent-1',
       1,

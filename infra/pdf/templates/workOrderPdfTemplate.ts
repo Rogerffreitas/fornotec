@@ -99,13 +99,16 @@ export function buildWorkOrderPdfDocument(params: WorkOrderPdfTemplateParams): D
         : undefined,
   }));
 
+  const temAssinaturaDigital = Boolean(ordem.clientSignatureName && ordem.clientSignatureStrokes?.length);
+
   const footerLines = [
     '_________________________________',
     'Assinatura do Técnico',
     '',
-    '_________________________________',
-    'Assinatura do Responsável / Cliente',
-    '',
+    // Sem assinatura digital, mantém a linha em branco tradicional pra assinar no papel.
+    ...(temAssinaturaDigital
+      ? []
+      : ['_________________________________', 'Assinatura do Responsável / Cliente', '']),
     `Documento gerado em ${formatarDataHora(new Date())}`,
   ];
 
@@ -114,6 +117,15 @@ export function buildWorkOrderPdfDocument(params: WorkOrderPdfTemplateParams): D
     subtitle: '',
     infoBox,
     sections,
+    signatureBlock: temAssinaturaDigital
+      ? {
+          label: 'Assinatura do Responsável / Cliente',
+          name: ordem.clientSignatureName as string,
+          strokes: ordem.clientSignatureStrokes as { x: number; y: number }[][],
+          strokesWidth: ordem.clientSignatureCanvasWidth || 1,
+          strokesHeight: ordem.clientSignatureCanvasHeight || 1,
+        }
+      : undefined,
     footerLines,
   };
 }

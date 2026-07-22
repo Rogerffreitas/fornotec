@@ -8,7 +8,9 @@ import { PriorityChip } from '../../../../components/PriorityChip';
 import { WorkOrderStatusBadge } from '../../../../components/WorkOrderStatusBadge';
 import { EmptyState } from '../../../../components/EmptyState';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
+import { AssinaturaModal } from '../../../../components/AssinaturaModal';
 import { WorkOrder } from '../../../../domain/entities/WorkOrder';
+import { AssinaturaCliente } from '../../../../domain/entities/Signature';
 import { Oven } from '../../../../domain/entities/Oven';
 import { Store } from '../../../../domain/entities/Store';
 import { WorkOrderOven } from '../../../../domain/entities/WorkOrder';
@@ -41,6 +43,7 @@ export default function DetalheOrdem() {
   const [finalizando, setFinalizando] = useState(false);
   const [cancelando, setCancelando] = useState(false);
   const [gerandoPdf, setGerandoPdf] = useState(false);
+  const [modalAssinaturaVisivel, setModalAssinaturaVisivel] = useState(false);
 
   const carregar = useCallback(async () => {
     const enterpriseId = user!.enterpriseId;
@@ -64,10 +67,11 @@ export default function DetalheOrdem() {
     }, [carregar]),
   );
 
-  async function finalizar() {
+  async function finalizar(assinatura: AssinaturaCliente) {
     setFinalizando(true);
     try {
-      await workOrderUseCase.finalize(user!.enterpriseId, id);
+      await workOrderUseCase.finalize(user!.enterpriseId, id, assinatura);
+      setModalAssinaturaVisivel(false);
       await carregar();
     } finally {
       setFinalizando(false);
@@ -166,8 +170,7 @@ export default function DetalheOrdem() {
           {podeGerenciar ? (
             <PrimaryButton
               titulo="Finalizar ordem"
-              onPress={finalizar}
-              carregando={finalizando}
+              onPress={() => setModalAssinaturaVisivel(true)}
               style={{ flex: 1 }}
             />
           ) : null}
@@ -180,6 +183,13 @@ export default function DetalheOrdem() {
           />
         </View>
       ) : null}
+
+      <AssinaturaModal
+        visivel={modalAssinaturaVisivel}
+        carregando={finalizando}
+        onCancelar={() => setModalAssinaturaVisivel(false)}
+        onConfirmar={finalizar}
+      />
     </Screen>
   );
 }

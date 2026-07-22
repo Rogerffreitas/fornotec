@@ -1,4 +1,5 @@
 import { WorkOrder, NewWorkOrder, WorkOrderOven } from '../entities/WorkOrder';
+import { AssinaturaCliente } from '../entities/Signature';
 
 export interface OvenOfNewOrder {
   ovenId: number;
@@ -15,6 +16,6 @@ export interface WorkOrderUseCase {
     data: NewWorkOrder,
     ovens: OvenOfNewOrder[],
   ): Promise<{ order: WorkOrder; orderOvens: WorkOrderOven[] }>;
-  finalize(enterpriseId: string, id: number): Promise<WorkOrder>;
+  finalize(enterpriseId: string, id: number, assinatura: AssinaturaCliente): Promise<WorkOrder>;
   cancel(enterpriseId: string, id: number): Promise<WorkOrder>;
 }

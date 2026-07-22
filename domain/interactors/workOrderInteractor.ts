@@ -1,6 +1,7 @@
 import { WorkOrderUseCase, OvenOfNewOrder } from '../use-case/workOrderUseCase';
 import { WorkOrderRepositoryGateway } from '../application/gateway/WorkOrderRepositoryGateway';
 import { WorkOrder, NewWorkOrder, WorkOrderOven } from '../entities/WorkOrder';
+import { AssinaturaCliente } from '../entities/Signature';
 import { OvenUseCase } from '../use-case/ovenUseCase';
 
 export class WorkOrderInteractor implements WorkOrderUseCase {
@@ -41,9 +42,9 @@ export class WorkOrderInteractor implements WorkOrderUseCase {
     return { order, orderOvens };
   }
 
-  /** Finaliza a ordem e propaga última/próxima manutenção para os fornos envolvidos. */
-  async finalize(enterpriseId: string, id: number): Promise<WorkOrder> {
-    const order = await this.gateway.updateStatus(enterpriseId, id, 'finalizada');
+  /** Finaliza a ordem, registra a assinatura do cliente e propaga última/próxima manutenção para os fornos envolvidos. */
+  async finalize(enterpriseId: string, id: number, assinatura: AssinaturaCliente): Promise<WorkOrder> {
+    const order = await this.gateway.updateStatus(enterpriseId, id, 'finalizada', assinatura);
     const orderOvens = await this.gateway.findOvensByOrder(enterpriseId, id);
     await Promise.all(
       orderOvens.map((oo) =>

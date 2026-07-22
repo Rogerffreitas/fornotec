@@ -123,4 +123,48 @@ describe('buildWorkOrderPdfDocument', () => {
       expect.arrayContaining([{ label: 'Loja', value: 'Não encontrada' }]),
     );
   });
+
+  it('sem assinatura digital, mantém a linha em branco tradicional e nenhum signatureBlock', () => {
+    const documento = buildWorkOrderPdfDocument({
+      ordem,
+      loja,
+      enterpriseName: 'Forno Tec Demo',
+      pecas: [],
+      itens: [],
+    });
+
+    expect(documento.signatureBlock).toBeUndefined();
+    expect(documento.footerLines).toEqual(
+      expect.arrayContaining(['Assinatura do Responsável / Cliente']),
+    );
+  });
+
+  it('com assinatura digital, monta o signatureBlock e tira a linha em branco do rodapé', () => {
+    const ordemAssinada: WorkOrder = {
+      ...ordem,
+      status: 'finalizada',
+      clientSignatureName: 'Maria Cliente',
+      clientSignatureStrokes: [[{ x: 0, y: 0 }, { x: 10, y: 5 }]],
+      clientSignatureCanvasWidth: 300,
+      clientSignatureCanvasHeight: 150,
+    };
+    const documento = buildWorkOrderPdfDocument({
+      ordem: ordemAssinada,
+      loja,
+      enterpriseName: 'Forno Tec Demo',
+      pecas: [],
+      itens: [],
+    });
+
+    expect(documento.signatureBlock).toEqual({
+      label: 'Assinatura do Responsável / Cliente',
+      name: 'Maria Cliente',
+      strokes: [[{ x: 0, y: 0 }, { x: 10, y: 5 }]],
+      strokesWidth: 300,
+      strokesHeight: 150,
+    });
+    expect(documento.footerLines).not.toEqual(
+      expect.arrayContaining(['Assinatura do Responsável / Cliente']),
+    );
+  });
 });

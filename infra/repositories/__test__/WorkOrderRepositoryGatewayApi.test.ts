@@ -33,7 +33,27 @@ describe('WorkOrderRepositoryGatewayApi.findById', () => {
     const result = await gateway.findById('ent-1', 3);
 
     expect(http.get).toHaveBeenCalledWith('/work-orders/3', { headers: authHeader() });
-    expect(result).toBe(order);
+    expect(result).toEqual(order);
+  });
+
+  it('parses clientSignatureData (JSON) into strokes + canvas size', async () => {
+    const order = {
+      id: 3,
+      clientSignatureName: 'Maria Cliente',
+      clientSignatureData: JSON.stringify({ tracos: [[{ x: 1, y: 2 }]], largura: 300, altura: 150 }),
+    };
+    const http = makeHttpClient({ get: jest.fn().mockResolvedValue(order) });
+    const gateway = new WorkOrderRepositoryGatewayApi(http);
+
+    const result = await gateway.findById('ent-1', 3);
+
+    expect(result).toEqual({
+      id: 3,
+      clientSignatureName: 'Maria Cliente',
+      clientSignatureStrokes: [[{ x: 1, y: 2 }]],
+      clientSignatureCanvasWidth: 300,
+      clientSignatureCanvasHeight: 150,
+    });
   });
 
   it('returns undefined on a 404 HttpError', async () => {
@@ -64,21 +84,44 @@ describe('WorkOrderRepositoryGatewayApi.create', () => {
     const result = await gateway.create('ent-1', data);
 
     expect(http.post).toHaveBeenCalledWith('/work-orders', data, { headers: authHeader() });
-    expect(result).toBe(created);
+    expect(result).toEqual(created);
   });
 });
 
 describe('WorkOrderRepositoryGatewayApi.updateStatus', () => {
   it('patches /work-orders/:id/status', async () => {
+    const updated = { id: 1, status: 'cancelada' };
+    const http = makeHttpClient({ patch: jest.fn().mockResolvedValue(updated) });
+    const gateway = new WorkOrderRepositoryGatewayApi(http);
+
+    await gateway.updateStatus('ent-1', 1, 'cancelada');
+
+    expect(http.patch).toHaveBeenCalledWith(
+      '/work-orders/1/status',
+      { status: 'cancelada' },
+      { headers: authHeader() },
+    );
+  });
+
+  it('sends the client signature (serialized) when finalizing', async () => {
     const updated = { id: 1, status: 'finalizada' };
     const http = makeHttpClient({ patch: jest.fn().mockResolvedValue(updated) });
     const gateway = new WorkOrderRepositoryGatewayApi(http);
 
-    await gateway.updateStatus('ent-1', 1, 'finalizada');
+    await gateway.updateStatus('ent-1', 1, 'finalizada', {
+      nome: 'Maria Cliente',
+      tracos: [[{ x: 1, y: 2 }]],
+      largura: 300,
+      altura: 150,
+    });
 
     expect(http.patch).toHaveBeenCalledWith(
       '/work-orders/1/status',
-      { status: 'finalizada' },
+      {
+        status: 'finalizada',
+        clientSignatureName: 'Maria Cliente',
+        clientSignatureData: JSON.stringify({ tracos: [[{ x: 1, y: 2 }]], largura: 300, altura: 150 }),
+      },
       { headers: authHeader() },
     );
   });

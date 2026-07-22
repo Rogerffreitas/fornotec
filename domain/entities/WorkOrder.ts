@@ -1,4 +1,5 @@
 import { WorkOrderPriority, WorkOrderStatus } from '../types';
+import { TracoAssinatura } from './Signature';
 
 export interface WorkOrder {
   id: number;
@@ -7,6 +8,12 @@ export interface WorkOrder {
   createdAt: string;
   status: WorkOrderStatus;
   priority: WorkOrderPriority;
+  /** Preenchidos ao finalizar a ordem — nome digitado e traços da assinatura do cliente. */
+  clientSignatureName?: string;
+  clientSignatureStrokes?: TracoAssinatura[];
+  /** Tamanho do canvas onde a assinatura foi desenhada, pro PDF escalar os traços certinho. */
+  clientSignatureCanvasWidth?: number;
+  clientSignatureCanvasHeight?: number;
 }
 
 export type NewWorkOrder = {

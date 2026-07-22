@@ -5,6 +5,7 @@ import {
   WorkOrderOven,
   NewWorkOrderOven,
 } from '../../domain/entities/WorkOrder';
+import { AssinaturaCliente } from '../../domain/entities/Signature';
 import { WorkOrderStatus } from '../../domain/types';
 import { workOrders, workOrderOvens } from './seed';
 import { delay, nextId } from './utils';
@@ -35,10 +36,17 @@ export class WorkOrderRepositoryGatewayImpl implements WorkOrderRepositoryGatewa
     enterpriseId: string,
     id: number,
     status: WorkOrderStatus,
+    assinatura?: AssinaturaCliente,
   ): Promise<WorkOrder> {
     const order = workOrders.find((o) => o.id === id && o.enterpriseId === enterpriseId);
     if (!order) throw new Error(`Ordem ${id} não encontrada`);
     order.status = status;
+    if (assinatura) {
+      order.clientSignatureName = assinatura.nome;
+      order.clientSignatureStrokes = assinatura.tracos;
+      order.clientSignatureCanvasWidth = assinatura.largura;
+      order.clientSignatureCanvasHeight = assinatura.altura;
+    }
     return delay(order);
   }
 

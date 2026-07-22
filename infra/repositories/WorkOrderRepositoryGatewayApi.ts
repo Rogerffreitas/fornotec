@@ -1,19 +1,45 @@
 import { WorkOrderRepositoryGateway } from '../../domain/application/gateway/WorkOrderRepositoryGateway';
 import { WorkOrder, NewWorkOrder, WorkOrderOven, NewWorkOrderOven } from '../../domain/entities/WorkOrder';
+import { AssinaturaCliente, TracoAssinatura } from '../../domain/entities/Signature';
 import { WorkOrderStatus } from '../../domain/types';
 import { HttpClient, HttpError } from '../../domain/application/infra/HttpClient';
 import { authHeader } from '../security/session';
+
+type ClientSignaturePayload = { tracos: TracoAssinatura[]; largura: number; altura: number };
+
+/** Formato bruto retornado pela API: assinatura vem como um único JSON serializado num campo de texto. */
+type WorkOrderBruta = Omit<
+  WorkOrder,
+  'clientSignatureStrokes' | 'clientSignatureCanvasWidth' | 'clientSignatureCanvasHeight'
+> & { clientSignatureData?: string };
+
+function mapearOrdem(bruta: WorkOrderBruta): WorkOrder {
+  const { clientSignatureData, ...resto } = bruta;
+  if (!clientSignatureData) return resto as WorkOrder;
+
+  const payload: ClientSignaturePayload = JSON.parse(clientSignatureData);
+  return {
+    ...resto,
+    clientSignatureStrokes: payload.tracos,
+    clientSignatureCanvasWidth: payload.largura,
+    clientSignatureCanvasHeight: payload.altura,
+  };
+}
 
 export class WorkOrderRepositoryGatewayApi implements WorkOrderRepositoryGateway {
   constructor(private readonly http: HttpClient) {}
 
   async findAll(_enterpriseId: string): Promise<WorkOrder[]> {
-    return this.http.get<WorkOrder[]>('/work-orders', { headers: authHeader() });
+    const resultado = await this.http.get<WorkOrderBruta[]>('/work-orders', { headers: authHeader() });
+    return resultado.map(mapearOrdem);
   }
 
   async findById(_enterpriseId: string, id: number): Promise<WorkOrder | undefined> {
     try {
-      return await this.http.get<WorkOrder>(`/work-orders/${id}`, { headers: authHeader() });
+      const resultado = await this.http.get<WorkOrderBruta>(`/work-orders/${id}`, {
+        headers: authHeader(),
+      });
+      return mapearOrdem(resultado);
     } catch (error) {
       if (error instanceof HttpError && error.status === 404) return undefined;
       throw error;
@@ -21,11 +47,35 @@ export class WorkOrderRepositoryGatewayApi implements WorkOrderRepositoryGateway
   }
 
   async create(_enterpriseId: string, data: NewWorkOrder): Promise<WorkOrder> {
-    return this.http.post<WorkOrder>('/work-orders', data, { headers: authHeader() });
+    const resultado = await this.http.post<WorkOrderBruta>('/work-orders', data, {
+      headers: authHeader(),
+    });
+    return mapearOrdem(resultado);
   }
 
-  async updateStatus(_enterpriseId: string, id: number, status: WorkOrderStatus): Promise<WorkOrder> {
-    return this.http.patch<WorkOrder>(`/work-orders/${id}/status`, { status }, { headers: authHeader() });
+  async updateStatus(
+    _enterpriseId: string,
+    id: number,
+    status: WorkOrderStatus,
+    assinatura?: AssinaturaCliente,
+  ): Promise<WorkOrder> {
+    const payload: ClientSignaturePayload | undefined = assinatura
+      ? { tracos: assinatura.tracos, largura: assinatura.largura, altura: assinatura.altura }
+      : undefined;
+    const resultado = await this.http.patch<WorkOrderBruta>(
+      `/work-orders/${id}/status`,
+      {
+        status,
+        ...(assinatura
+          ? {
+              clientSignatureName: assinatura.nome,
+              clientSignatureData: JSON.stringify(payload),
+            }
+          : {}),
+      },
+      { headers: authHeader() },
+    );
+    return mapearOrdem(resultado);
   }
 
   async findOvensByOrder(_enterpriseId: string, orderId: number): Promise<WorkOrderOven[]> {
