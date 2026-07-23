@@ -1,42 +1,63 @@
+import { ComponentProps } from 'react';
 import { router } from 'expo-router';
+import type FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Modulo, podeAcessarModulo } from '../../domain/types/permissions';
 import { Tom } from '../../components/ListRow';
 import { useAuth } from '../../context/AuthContext';
+
+type IconeFontAwesome = ComponentProps<typeof FontAwesome>['name'];
 
 export interface DashboardModulo {
   titulo: string;
   descricao: string;
   rota: string;
   modulo: Modulo;
+  icone: IconeFontAwesome;
 }
 
 const MODULOS: DashboardModulo[] = [
-  { titulo: 'Lojas', descricao: 'Cadastro de lojas', rota: '/lojas', modulo: 'lojas' },
+  { titulo: 'Lojas', descricao: 'Cadastro de lojas', rota: '/lojas', modulo: 'lojas', icone: 'building-o' },
   {
     titulo: 'Ordens de Serviço',
     descricao: 'Abrir e acompanhar ordens',
     rota: '/ordem-de-servico',
     modulo: 'ordem-de-servico',
+    icone: 'clipboard',
   },
-  { titulo: 'Peças', descricao: 'Cadastro de peças', rota: '/pecas', modulo: 'pecas' },
-  { titulo: 'Fornos', descricao: 'Cadastro de fornos por loja', rota: '/fornos', modulo: 'fornos' },
+  {
+    titulo: 'Peças',
+    descricao: 'Cadastro de peças',
+    rota: '/pecas',
+    modulo: 'pecas',
+    icone: 'cogs',
+  },
+  {
+    titulo: 'Fornos',
+    descricao: 'Cadastro de fornos por loja',
+    rota: '/fornos',
+    modulo: 'fornos',
+    icone: 'fire',
+  },
   {
     titulo: 'Peças do Forno',
     descricao: 'Associar peças aos fornos',
     rota: '/pecas-forno',
     modulo: 'pecas-forno',
+    icone: 'link',
   },
   {
     titulo: 'Manutenções',
     descricao: 'Histórico de manutenções',
     rota: '/manutencao',
     modulo: 'manutencao',
+    icone: 'wrench',
   },
   {
     titulo: 'Relatórios',
     descricao: 'Relatórios analítico e sintético por loja',
     rota: '/reports',
     modulo: 'relatorios',
+    icone: 'bar-chart',
   },
 ];
 

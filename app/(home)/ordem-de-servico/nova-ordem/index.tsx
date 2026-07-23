@@ -125,6 +125,11 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing.md,
     marginBottom: spacing.sm,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
   },
   fornoCardSelecionado: { borderColor: colors.primary },
   fornoCabecalho: {
