@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { Modulo, podeAcessarModulo } from '../../domain/types/permissions';
+import { Tom } from '../../components/ListRow';
 import { useAuth } from '../../context/AuthContext';
 
 export interface DashboardModulo {
@@ -40,18 +41,30 @@ const MODULOS: DashboardModulo[] = [
 ];
 
 export interface UseDashboardResult {
+  saudacao: string;
   userName: string;
-  roleLabel: string;
+  roleBadge: { texto: string; tom: Tom } | null;
   modulosVisiveis: DashboardModulo[];
   sair: () => void;
+}
+
+/** Bom dia / Boa tarde / Boa noite, conforme o horário local do dispositivo. */
+function saudacaoPorHorario(hora: number): string {
+  if (hora < 12) return 'Bom dia';
+  if (hora < 18) return 'Boa tarde';
+  return 'Boa noite';
 }
 
 /** Filtra os módulos visíveis pelo perfil do usuário e concentra o logout — a tela (`index.tsx`) só monta a UI. */
 export function useDashboard(): UseDashboardResult {
   const { user, logout } = useAuth();
 
-  const roleLabel =
-    user?.role === 'TECHNICAL' ? 'Perfil: técnico' : user?.role === 'CLIENT' ? 'Perfil: cliente' : '';
+  const roleBadge: { texto: string; tom: Tom } | null =
+    user?.role === 'TECHNICAL'
+      ? { texto: 'Técnico', tom: 'sucesso' }
+      : user?.role === 'CLIENT'
+        ? { texto: 'Cliente', tom: 'neutro' }
+        : null;
 
   function sair() {
     logout();
@@ -59,8 +72,9 @@ export function useDashboard(): UseDashboardResult {
   }
 
   return {
+    saudacao: saudacaoPorHorario(new Date().getHours()),
     userName: user?.name ?? '',
-    roleLabel,
+    roleBadge,
     modulosVisiveis: MODULOS.filter((m) => podeAcessarModulo(user!.role, m.modulo)),
     sair,
   };

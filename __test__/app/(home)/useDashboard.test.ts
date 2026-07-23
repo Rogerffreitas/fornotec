@@ -15,13 +15,17 @@ beforeEach(() => {
   replaceMock.mockReset();
 });
 
+afterEach(() => {
+  jest.useRealTimers();
+});
+
 describe('useDashboard', () => {
-  it('shows every module for TECHNICAL', () => {
+  it('shows every module for TECHNICAL, with a "sucesso" role badge', () => {
     useAuthMock.mockReturnValue({ user: { name: 'Roger', role: 'TECHNICAL' }, logout: logoutMock });
     const { result } = renderHook(() => useDashboard());
 
     expect(result.current.userName).toBe('Roger');
-    expect(result.current.roleLabel).toBe('Perfil: técnico');
+    expect(result.current.roleBadge).toEqual({ texto: 'Técnico', tom: 'sucesso' });
     expect(result.current.modulosVisiveis.map((m) => m.modulo)).toEqual([
       'lojas',
       'ordem-de-servico',
@@ -33,11 +37,11 @@ describe('useDashboard', () => {
     ]);
   });
 
-  it('restricts CLIENT to lojas/ordem-de-servico/fornos/relatorios', () => {
+  it('restricts CLIENT to lojas/ordem-de-servico/fornos/relatorios, with a "neutro" role badge', () => {
     useAuthMock.mockReturnValue({ user: { name: 'Maria', role: 'CLIENT' }, logout: logoutMock });
     const { result } = renderHook(() => useDashboard());
 
-    expect(result.current.roleLabel).toBe('Perfil: cliente');
+    expect(result.current.roleBadge).toEqual({ texto: 'Cliente', tom: 'neutro' });
     expect(result.current.modulosVisiveis.map((m) => m.modulo)).toEqual([
       'lojas',
       'ordem-de-servico',
@@ -54,5 +58,19 @@ describe('useDashboard', () => {
 
     expect(logoutMock).toHaveBeenCalled();
     expect(replaceMock).toHaveBeenCalledWith('/login');
+  });
+
+  it.each([
+    [8, 'Bom dia'],
+    [14, 'Boa tarde'],
+    [20, 'Boa noite'],
+  ])('at %i h greets with "%s"', (hora, esperado) => {
+    useAuthMock.mockReturnValue({ user: { name: 'Roger', role: 'TECHNICAL' }, logout: logoutMock });
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date(2026, 0, 1, hora, 0, 0));
+
+    const { result } = renderHook(() => useDashboard());
+
+    expect(result.current.saudacao).toBe(esperado);
   });
 });
