@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
 import { colors, spacing, radius } from './theme';
 
@@ -7,11 +7,15 @@ interface Props extends TextInputProps {
   erro?: string;
 }
 
-export function TextField({ rotulo, erro, style, ...rest }: Props) {
+export const TextField = forwardRef<TextInput, Props>(function TextField(
+  { rotulo, erro, style, ...rest },
+  ref,
+) {
   return (
     <View style={styles.container}>
       <Text style={styles.rotulo}>{rotulo}</Text>
       <TextInput
+        ref={ref}
         placeholderTextColor={colors.textSecondary}
         style={[styles.input, erro ? styles.inputComErro : null, style]}
         {...rest}
@@ -19,7 +23,7 @@ export function TextField({ rotulo, erro, style, ...rest }: Props) {
       {erro ? <Text style={styles.erro}>{erro}</Text> : null}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: { marginBottom: spacing.md },

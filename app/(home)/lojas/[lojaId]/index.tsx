@@ -1,5 +1,5 @@
-import React from 'react';
-import { Text, ScrollView, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Text, View, ScrollView, TextInput, StyleSheet } from 'react-native';
 import { Stack } from 'expo-router';
 import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
@@ -28,6 +28,17 @@ export default function EditarLoja() {
     salvar,
   } = useEditStore();
 
+  const descriptionRef = useRef<TextInput>(null);
+  const addressRef = useRef<TextInput>(null);
+  const contactNameRef = useRef<TextInput>(null);
+  const contactNumberRef = useRef<TextInput>(null);
+  const emailRef = useRef<TextInput>(null);
+  const buttonRef = useRef<View>(null);
+
+  useEffect(() => {
+    if (erro) descriptionRef.current?.focus();
+  }, [erro]);
+
   if (carregado && naoEncontrada) {
     return (
       <Screen>
@@ -43,35 +54,53 @@ export default function EditarLoja() {
       {carregado ? (
         <ScrollView showsVerticalScrollIndicator={false}>
           <TextField
+            ref={descriptionRef}
             rotulo="Descrição *"
             value={description}
             onChangeText={setDescription}
             placeholder="Loja Centro"
             maxLength={STORE_FIELD_MAX_LENGTH}
+            autoFocus
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => addressRef.current?.focus()}
           />
           <TextField
+            ref={addressRef}
             rotulo="Endereço *"
             value={address}
             onChangeText={setAddress}
             placeholder="Rua Exemplo, 123"
             maxLength={STORE_FIELD_MAX_LENGTH}
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => contactNameRef.current?.focus()}
           />
           <TextField
+            ref={contactNameRef}
             rotulo="Nome do contato"
             value={contactName}
             onChangeText={setContactName}
             placeholder="Maria Souza"
             maxLength={STORE_FIELD_MAX_LENGTH}
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => contactNumberRef.current?.focus()}
           />
           <TextField
+            ref={contactNumberRef}
             rotulo="Telefone do contato"
             value={contactNumber}
             onChangeText={setContactNumber}
             placeholder="(85) 99999-0000"
             keyboardType="phone-pad"
             maxLength={STORE_FIELD_MAX_LENGTH}
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => emailRef.current?.focus()}
           />
           <TextField
+            ref={emailRef}
             rotulo="E-mail do responsável"
             value={email}
             onChangeText={setEmail}
@@ -79,9 +108,12 @@ export default function EditarLoja() {
             keyboardType="email-address"
             autoCapitalize="none"
             maxLength={STORE_FIELD_MAX_LENGTH}
+            returnKeyType="done"
+            onSubmitEditing={() => buttonRef.current?.focus()}
           />
           {erro ? <Text style={styles.erro}>{erro}</Text> : null}
           <PrimaryButton
+            ref={buttonRef}
             titulo="Salvar alterações"
             onPress={salvar}
             carregando={salvando}

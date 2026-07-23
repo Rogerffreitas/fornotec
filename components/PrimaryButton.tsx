@@ -1,5 +1,5 @@
-import React from 'react';
-import { Pressable, Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
+import React, { forwardRef } from 'react';
+import { Pressable, Text, StyleSheet, ActivityIndicator, View, ViewStyle } from 'react-native';
 import { colors, spacing, radius } from './theme';
 
 interface Props {
@@ -11,18 +11,15 @@ interface Props {
   style?: ViewStyle;
 }
 
-export function PrimaryButton({
-  titulo,
-  onPress,
-  variante = 'primaria',
-  carregando,
-  desabilitado,
-  style,
-}: Props) {
+export const PrimaryButton = forwardRef<View, Props>(function PrimaryButton(
+  { titulo, onPress, variante = 'primaria', carregando, desabilitado, style },
+  ref,
+) {
   const ehPrimaria = variante === 'primaria';
   const ehPerigo = variante === 'perigo';
   return (
     <Pressable
+      ref={ref}
       onPress={onPress}
       disabled={desabilitado || carregando}
       style={({ pressed }) => [
@@ -44,7 +41,7 @@ export function PrimaryButton({
       )}
     </Pressable>
   );
-}
+});
 
 const styles = StyleSheet.create({
   base: {

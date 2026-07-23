@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, Pressable, TextInput, StyleSheet } from 'react-native';
 import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
@@ -12,14 +12,25 @@ export default function NovaPeca() {
   const { description, setDescription, location, setLocation, salvando, erro, salvar } =
     useNewPart();
 
+  const descriptionRef = useRef<TextInput>(null);
+  const buttonRef = useRef<View>(null);
+
+  useEffect(() => {
+    if (erro) descriptionRef.current?.focus();
+  }, [erro]);
+
   return (
     <Screen>
       <TextField
+        ref={descriptionRef}
         rotulo="Descrição *"
         value={description}
         onChangeText={setDescription}
         placeholder="Resistência blindada"
         maxLength={PART_FIELD_MAX_LENGTH}
+        autoFocus
+        returnKeyType="done"
+        onSubmitEditing={() => buttonRef.current?.focus()}
       />
 
       <Text style={styles.rotulo}>Localização *</Text>
@@ -39,6 +50,7 @@ export default function NovaPeca() {
 
       {erro ? <Text style={styles.erro}>{erro}</Text> : null}
       <PrimaryButton
+        ref={buttonRef}
         titulo="Salvar peça"
         onPress={salvar}
         carregando={salvando}

@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, Image, StyleSheet, TextInput } from 'react-native';
 import { Screen } from '../../components/Screen';
 import { TextField } from '../../components/TextField';
 import { PrimaryButton } from '../../components/PrimaryButton';
@@ -10,6 +10,14 @@ import { useLoginForm } from './useLoginForm';
 export default function Login() {
   const { role, setRole, username, setUsername, password, setPassword, loading, error, handleEntrar } =
     useLoginForm();
+
+  const usernameRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const buttonRef = useRef<View>(null);
+
+  useEffect(() => {
+    if (error) usernameRef.current?.focus();
+  }, [error]);
 
   return (
     <Screen>
@@ -30,22 +38,30 @@ export default function Login() {
           <RoleToggle valor={role} aoMudar={setRole} />
 
           <TextField
+            ref={usernameRef}
             rotulo="Usuário"
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
             placeholder="usuário"
+            autoFocus
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => passwordRef.current?.focus()}
           />
           <TextField
+            ref={passwordRef}
             rotulo="Senha"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
             placeholder="••••••"
+            returnKeyType="done"
+            onSubmitEditing={() => buttonRef.current?.focus()}
           />
 
           {error ? <Text style={styles.erro}>{error}</Text> : null}
-          <PrimaryButton titulo="Entrar" onPress={handleEntrar} carregando={loading} />
+          <PrimaryButton ref={buttonRef} titulo="Entrar" onPress={handleEntrar} carregando={loading} />
         </View>
       </View>
     </Screen>

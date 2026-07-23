@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, Pressable, ScrollView, TextInput, StyleSheet } from 'react-native';
 import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
@@ -31,6 +31,19 @@ export default function NovoForno() {
     salvar,
   } = useNewOven();
 
+  const descriptionRef = useRef<TextInput>(null);
+  const assetNumberRef = useRef<TextInput>(null);
+  const markRef = useRef<TextInput>(null);
+  const voltageRef = useRef<TextInput>(null);
+  const powerRef = useRef<TextInput>(null);
+  const referenceRef = useRef<TextInput>(null);
+  const maintenanceFrequencyRef = useRef<TextInput>(null);
+  const buttonRef = useRef<View>(null);
+
+  useEffect(() => {
+    if (erro) descriptionRef.current?.focus();
+  }, [erro]);
+
   return (
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -50,46 +63,80 @@ export default function NovoForno() {
         </View>
 
         <TextField
+          ref={descriptionRef}
           rotulo="Descrição do forno *"
           value={description}
           onChangeText={setDescription}
           placeholder="Forno combinado 10 GN"
           maxLength={OVEN_DESCRIPTION_MAX_LENGTH}
+          autoFocus
+          returnKeyType="next"
+          blurOnSubmit={false}
+          onSubmitEditing={() => assetNumberRef.current?.focus()}
         />
         <TextField
+          ref={assetNumberRef}
           rotulo="Número do patrimônio"
           value={assetNumber}
           onChangeText={setAssetNumber}
           placeholder="PAT-0001"
+          returnKeyType="next"
+          blurOnSubmit={false}
+          onSubmitEditing={() => markRef.current?.focus()}
         />
-        <TextField rotulo="Marca" value={mark} onChangeText={setMark} placeholder="Rational" />
         <TextField
+          ref={markRef}
+          rotulo="Marca"
+          value={mark}
+          onChangeText={setMark}
+          placeholder="Rational"
+          returnKeyType="next"
+          blurOnSubmit={false}
+          onSubmitEditing={() => voltageRef.current?.focus()}
+        />
+        <TextField
+          ref={voltageRef}
           rotulo="Tensão"
           value={voltage}
           onChangeText={setVoltage}
           placeholder="ex: 220V"
+          returnKeyType="next"
+          blurOnSubmit={false}
+          onSubmitEditing={() => powerRef.current?.focus()}
         />
         <TextField
+          ref={powerRef}
           rotulo="Potência"
           value={power}
           onChangeText={setPower}
           placeholder="ex: 10000W"
+          returnKeyType="next"
+          blurOnSubmit={false}
+          onSubmitEditing={() => referenceRef.current?.focus()}
         />
         <TextField
+          ref={referenceRef}
           rotulo="Referência"
           value={reference}
           onChangeText={setReference}
           placeholder="FRC-10GN"
+          returnKeyType="next"
+          blurOnSubmit={false}
+          onSubmitEditing={() => maintenanceFrequencyRef.current?.focus()}
         />
         <TextField
+          ref={maintenanceFrequencyRef}
           rotulo="Periodicidade de manutenção (dias) *"
           value={maintenanceFrequency}
           onChangeText={setMaintenanceFrequency}
           keyboardType="numeric"
+          returnKeyType="done"
+          onSubmitEditing={() => buttonRef.current?.focus()}
         />
 
         {erro ? <Text style={styles.erro}>{erro}</Text> : null}
         <PrimaryButton
+          ref={buttonRef}
           titulo="Salvar forno"
           onPress={salvar}
           carregando={salvando}
