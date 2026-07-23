@@ -52,6 +52,20 @@ describe('MaintenanceRepositoryGatewayApi.findByOrderAndOven', () => {
   });
 });
 
+describe('MaintenanceRepositoryGatewayApi.findByStore', () => {
+  it('gets /maintenances filtered by storeId only (sem paginação)', async () => {
+    const http = makeHttpClient({ get: jest.fn().mockResolvedValue([]) });
+    const gateway = new MaintenanceRepositoryGatewayApi(http);
+
+    await gateway.findByStore('ent-1', 5);
+
+    expect(http.get).toHaveBeenCalledWith('/maintenances', {
+      headers: authHeader(),
+      params: { storeId: 5 },
+    });
+  });
+});
+
 describe('MaintenanceRepositoryGatewayApi.findPage', () => {
   it('sends page/pageSize and omits storeId/ovenId when not given', async () => {
     const page = { items: [], total: 0 };

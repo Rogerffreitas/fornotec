@@ -31,6 +31,15 @@ export class MaintenanceRepositoryGatewayImpl implements MaintenanceRepositoryGa
     );
   }
 
+  async findByStore(enterpriseId: string, storeId: number): Promise<Maintenance[]> {
+    const ovenIdsDaLoja = new Set(
+      ovens.filter((o) => o.enterpriseId === enterpriseId && o.storeId === storeId).map((o) => o.id),
+    );
+    return delay(
+      maintenances.filter((m) => m.enterpriseId === enterpriseId && ovenIdsDaLoja.has(m.ovenId)),
+    );
+  }
+
   async findPage(enterpriseId: string, filters: MaintenanceFilters): Promise<MaintenancePage> {
     const ovenIdsDaLoja = filters.storeId
       ? new Set(

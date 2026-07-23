@@ -25,6 +25,10 @@ export class MaintenanceInteractor implements MaintenanceUseCase {
     return this.gateway.findByOrderAndOven(enterpriseId, orderId, ovenId);
   }
 
+  async findByStore(enterpriseId: string, storeId: number): Promise<Maintenance[]> {
+    return this.gateway.findByStore(enterpriseId, storeId);
+  }
+
   async findPage(enterpriseId: string, filters: MaintenanceFilters): Promise<MaintenancePage> {
     return this.gateway.findPage(enterpriseId, filters);
   }

@@ -10,6 +10,7 @@ const MARGIN = 40;
 const CONTENT_WIDTH = PAGE_SIZE[0] - MARGIN * 2;
 const LINE_HEIGHT = 14;
 const BAND_HEIGHT = 80;
+const SUBSECTION_INDENT = 14;
 
 /** Identidade visual da Fornotec (ver infra/pdf/Guara-Jacarecanga.pdf, relatório de referência). */
 const BRAND_GREEN = rgb(2 / 255, 47 / 255, 26 / 255);
@@ -132,14 +133,15 @@ export class PdfLibPdfGenerator implements PdfGenerator {
 
     const drawLine = (
       text: string,
-      options: { bold?: boolean; size?: number; color?: ReturnType<typeof rgb> } = {},
+      options: { bold?: boolean; size?: number; color?: ReturnType<typeof rgb>; indent?: number } = {},
     ) => {
       const size = options.size ?? 11;
       const usedFont = options.bold ? fontBold : font;
       const color = options.color ?? TEXT_DARK;
-      for (const line of wrapText(usedFont, text, size, CONTENT_WIDTH)) {
+      const indent = options.indent ?? 0;
+      for (const line of wrapText(usedFont, text, size, CONTENT_WIDTH - indent)) {
         ensureSpace(LINE_HEIGHT);
-        page.drawText(line, { x: MARGIN, y, size, font: usedFont, color });
+        page.drawText(line, { x: MARGIN + indent, y, size, font: usedFont, color });
         y -= LINE_HEIGHT;
       }
     };
@@ -178,14 +180,19 @@ export class PdfLibPdfGenerator implements PdfGenerator {
       y -= boxHeight + 14;
     };
 
-    const drawTable = (columns: { header: string; weight?: number }[], rows: string[][]) => {
+    const drawTable = (
+      columns: { header: string; weight?: number }[],
+      rows: string[][],
+      indent: number = 0,
+    ) => {
+      const availableWidth = CONTENT_WIDTH - indent;
       const totalWeight = columns.reduce((sum, c) => sum + (c.weight ?? 1), 0);
-      const colWidths = columns.map((c) => ((c.weight ?? 1) / totalWeight) * CONTENT_WIDTH);
+      const colWidths = columns.map((c) => ((c.weight ?? 1) / totalWeight) * availableWidth);
       const colX: number[] = [];
       colWidths.reduce((x, w) => {
         colX.push(x);
         return x + w;
-      }, MARGIN);
+      }, MARGIN + indent);
 
       const drawHeaderRow = () => {
         const headerHeight = TABLE_LINE_HEIGHT + TABLE_CELL_PADDING * 2;
@@ -296,7 +303,10 @@ export class PdfLibPdfGenerator implements PdfGenerator {
       drawInfoBox(definitions.infoBox);
     }
 
-    for (const section of definitions.sections) {
+    definitions.sections.forEach((section, index) => {
+      if (section.pageBreakBefore && index > 0) {
+        newPage();
+      }
       ensureSpace(LINE_HEIGHT + 6);
       y -= 6;
       if (section.heading) {
@@ -308,7 +318,20 @@ export class PdfLibPdfGenerator implements PdfGenerator {
       if (section.table) {
         drawTable(section.table.columns, section.table.rows);
       }
-    }
+      for (const sub of section.subsections ?? []) {
+        ensureSpace(LINE_HEIGHT + 4);
+        y -= 4;
+        if (sub.heading) {
+          drawLine(sub.heading, { bold: true, size: 11, indent: SUBSECTION_INDENT });
+        }
+        for (const line of sub.lines ?? []) {
+          drawLine(line, { size: 9.5, color: TEXT_MUTED, indent: SUBSECTION_INDENT });
+        }
+        if (sub.table) {
+          drawTable(sub.table.columns, sub.table.rows, SUBSECTION_INDENT);
+        }
+      }
+    });
 
     if (definitions.signatureBlock) {
       y -= 10;

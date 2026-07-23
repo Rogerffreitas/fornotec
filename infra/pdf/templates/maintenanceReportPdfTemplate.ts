@@ -21,7 +21,7 @@ export interface MaintenanceReportTemplateParams {
   itens: MaintenanceReportOvenItem[];
 }
 
-const REPORT_COLUMNS = [
+export const REPORT_COLUMNS = [
   { header: 'Referência', weight: 1 },
   { header: 'Descrição', weight: 2.1 },
   { header: 'Data', weight: 0.85 },
@@ -30,12 +30,12 @@ const REPORT_COLUMNS = [
   { header: 'Observação', weight: 1.9 },
 ];
 
-function formatarData(iso: string): string {
+export function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR');
 }
 
 /** Para cada peça, a manutenção mais recente registrada nela (de qualquer ordem). */
-function ultimaManutencaoPorPeca(historico: Maintenance[]): Map<number, Maintenance> {
+export function ultimaManutencaoPorPeca(historico: Maintenance[]): Map<number, Maintenance> {
   const porPeca = new Map<number, Maintenance>();
   for (const m of historico) {
     const atual = porPeca.get(m.partId);
@@ -46,7 +46,7 @@ function ultimaManutencaoPorPeca(historico: Maintenance[]): Map<number, Maintena
   return porPeca;
 }
 
-function linhaForno(oven: Oven): string {
+export function linhaForno(oven: Oven): string {
   return `Forno: ${oven.assetNumber || 's/ patrimônio'} — ${oven.description}`;
 }
 

@@ -28,6 +28,12 @@ const MODULOS: { titulo: string; descricao: string; rota: string; modulo: Modulo
     rota: '/manutencao',
     modulo: 'manutencao',
   },
+  {
+    titulo: 'Relatórios',
+    descricao: 'Relatórios analítico e sintético por loja',
+    rota: '/reports',
+    modulo: 'relatorios',
+  },
 ];
 
 export default function Home() {

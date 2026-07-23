@@ -1,10 +1,11 @@
 import { moduloDaRota, podeAcessarModulo, podeGerenciarOrdem } from '../permissions';
 
 describe('podeAcessarModulo', () => {
-  it('libera lojas, fornos e ordem de serviço para o cliente', () => {
+  it('libera lojas, fornos, ordem de serviço e relatórios para o cliente', () => {
     expect(podeAcessarModulo('CLIENT', 'lojas')).toBe(true);
     expect(podeAcessarModulo('CLIENT', 'fornos')).toBe(true);
     expect(podeAcessarModulo('CLIENT', 'ordem-de-servico')).toBe(true);
+    expect(podeAcessarModulo('CLIENT', 'relatorios')).toBe(true);
   });
 
   it('bloqueia peças, peças-do-forno e manutenção para o cliente', () => {
@@ -14,7 +15,15 @@ describe('podeAcessarModulo', () => {
   });
 
   it('libera todos os módulos para técnico e admin', () => {
-    const modulos = ['lojas', 'fornos', 'ordem-de-servico', 'pecas', 'pecas-forno', 'manutencao'] as const;
+    const modulos = [
+      'lojas',
+      'fornos',
+      'ordem-de-servico',
+      'pecas',
+      'pecas-forno',
+      'manutencao',
+      'relatorios',
+    ] as const;
     modulos.forEach((modulo) => {
       expect(podeAcessarModulo('TECHNICAL', modulo)).toBe(true);
       expect(podeAcessarModulo('ADMIN', modulo)).toBe(true);
@@ -44,6 +53,7 @@ describe('moduloDaRota', () => {
     expect(moduloDaRota('/manutencao/10')).toBe('manutencao');
     expect(moduloDaRota('/ordem-de-servico')).toBe('ordem-de-servico');
     expect(moduloDaRota('/ordem-de-servico/10')).toBe('ordem-de-servico');
+    expect(moduloDaRota('/reports')).toBe('relatorios');
   });
 
   it('trata a rota de registrar manutenção dentro de uma ordem como módulo de manutenção', () => {

@@ -18,10 +18,20 @@ export interface DocumentTable {
   rows: string[][];
 }
 
+/** Bloco aninhado dentro de uma section (ex: uma peça, com a lista de OS que a atenderam). */
+export interface DocumentSubsection {
+  heading?: string;
+  lines?: string[];
+  table?: DocumentTable;
+}
+
 export interface DocumentSection {
   heading?: string;
   lines?: string[];
   table?: DocumentTable;
+  subsections?: DocumentSubsection[];
+  /** Força início de página antes desta section (ex: um forno por página nos relatórios). Ignorado na primeira section. */
+  pageBreakBefore?: boolean;
 }
 
 export interface DocumentSignatureBlock {

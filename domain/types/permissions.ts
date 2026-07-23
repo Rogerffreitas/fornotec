@@ -7,15 +7,16 @@ export type Modulo =
   | 'ordem-de-servico'
   | 'pecas'
   | 'pecas-forno'
-  | 'manutencao';
+  | 'manutencao'
+  | 'relatorios';
 
 /**
  * Módulos liberados para o perfil cliente: ver/cadastrar/editar lojas e fornos,
- * ver/cadastrar/cancelar ordens de serviço. Técnico (e admin) têm acesso total —
- * peças, peças do forno e manutenção (incluindo registrar manutenção numa ordem)
- * ficam restritos ao técnico.
+ * ver/cadastrar/cancelar ordens de serviço, e gerar os relatórios de manutenção por
+ * loja. Técnico (e admin) têm acesso total — peças, peças do forno e manutenção
+ * (incluindo registrar manutenção numa ordem) ficam restritos ao técnico.
  */
-const MODULOS_CLIENTE: readonly Modulo[] = ['lojas', 'fornos', 'ordem-de-servico'];
+const MODULOS_CLIENTE: readonly Modulo[] = ['lojas', 'fornos', 'ordem-de-servico', 'relatorios'];
 
 export function podeAcessarModulo(role: Role, modulo: Modulo): boolean {
   if (role === 'CLIENT') return MODULOS_CLIENTE.includes(modulo);
@@ -39,5 +40,6 @@ export function moduloDaRota(pathname: string): Modulo | null {
   if (pathname.startsWith('/pecas')) return 'pecas';
   if (pathname.startsWith('/fornos')) return 'fornos';
   if (pathname.startsWith('/manutencao')) return 'manutencao';
+  if (pathname.startsWith('/reports')) return 'relatorios';
   return null;
 }

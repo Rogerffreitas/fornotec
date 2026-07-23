@@ -34,6 +34,7 @@ export default function Home() {
         <Stack.Screen name="pecas-forno/[fornoId]/index" options={{ title: 'Peças do forno' }} />
         <Stack.Screen name="pecas/nova-peca/index" options={{ title: 'Cadastrar peça' }} />
         <Stack.Screen name="ordem-de-servico/nova-ordem/index" options={{ title: 'Cadastrar nova OS' }} />
+        <Stack.Screen name="reports/index" options={{ title: 'Relatórios' }} />
       </Stack>
     </View>
   );

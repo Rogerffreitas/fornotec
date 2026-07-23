@@ -33,6 +33,13 @@ export class MaintenanceRepositoryGatewayApi implements MaintenanceRepositoryGat
     });
   }
 
+  async findByStore(_enterpriseId: string, storeId: number): Promise<Maintenance[]> {
+    return this.http.get<Maintenance[]>('/maintenances', {
+      headers: authHeader(),
+      params: { storeId },
+    });
+  }
+
   async findPage(_enterpriseId: string, filters: MaintenanceFilters): Promise<MaintenancePage> {
     return this.http.get<MaintenancePage>('/maintenances', {
       headers: authHeader(),

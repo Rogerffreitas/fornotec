@@ -9,6 +9,7 @@ function makeGateway(
     findAll: jest.fn(),
     findByOrder: jest.fn(),
     findByOrderAndOven: jest.fn(),
+    findByStore: jest.fn(),
     findPage: jest.fn(),
     createMany: jest.fn(),
     remove: jest.fn(),
@@ -59,6 +60,15 @@ describe('MaintenanceInteractor read methods', () => {
     await interactor.findByOrderAndOven('ent-1', 5, 9);
 
     expect(gateway.findByOrderAndOven).toHaveBeenCalledWith('ent-1', 5, 9);
+  });
+
+  it('findByStore delegates to the gateway with the storeId', async () => {
+    const gateway = makeGateway({ findByStore: jest.fn().mockResolvedValue([buildMaintenance()]) });
+    const interactor = new MaintenanceInteractor(gateway);
+
+    await interactor.findByStore('ent-1', 4);
+
+    expect(gateway.findByStore).toHaveBeenCalledWith('ent-1', 4);
   });
 
   it('findPage delegates to the gateway with the filters object', async () => {
