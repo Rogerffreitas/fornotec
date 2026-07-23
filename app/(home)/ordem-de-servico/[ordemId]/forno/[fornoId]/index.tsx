@@ -1,93 +1,33 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { useLocalSearchParams, router, Stack } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
+import { Stack } from 'expo-router';
 import { Screen } from '../../../../../../components/Screen';
 import { TextField } from '../../../../../../components/TextField';
 import { PrimaryButton } from '../../../../../../components/PrimaryButton';
 import { EmptyState } from '../../../../../../components/EmptyState';
 import { ServiceTypeChip } from '../../../../../../components/ServiceTypeChip';
-import { Part } from '../../../../../../domain/entities/Part';
-import { Maintenance, NewMaintenanceItem } from '../../../../../../domain/entities/Maintenance';
-import { SERVICE_TYPES, ServiceType } from '../../../../../../domain/types';
-import {
-  ovenUseCase,
-  partUseCase,
-  maintenanceUseCase,
-} from '../../../../../../infra/ioc/container';
+import { SERVICE_TYPES } from '../../../../../../domain/types';
 import { colors, spacing, radius } from '../../../../../../components/theme';
-import { useAuth } from '@/context/AuthContext';
+import { useOrderOvenMaintenance } from './useOrderOvenMaintenance';
 
 export default function NovaManutencao() {
-  const { user } = useAuth();
-  const { ordemId, fornoId } = useLocalSearchParams<{ ordemId: string; fornoId: string }>();
-  const orderId = Number(ordemId);
-  const ovenId = Number(fornoId);
-
-  const [pecasDoForno, setPecasDoForno] = useState<Part[]>([]);
-  const [jaRegistradas, setJaRegistradas] = useState<Maintenance[]>([]);
-
-  const [partId, setPartId] = useState<number | null>(null);
-  const [servico, setServico] = useState<ServiceType | null>(null);
-  const [observacao, setObservacao] = useState('');
-  const [pendentes, setPendentes] = useState<NewMaintenanceItem[]>([]);
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
-
-  const carregar = useCallback(async () => {
-    const enterpriseId = user!.enterpriseId;
-    const associacoes = await ovenUseCase.findPartsOfOven(enterpriseId, ovenId);
-    const [pecas, registradas] = await Promise.all([
-      partUseCase.findByIds(
-        enterpriseId,
-        associacoes.map((a) => a.partId),
-      ),
-      maintenanceUseCase.findByOrderAndOven(enterpriseId, orderId, ovenId),
-    ]);
-    setPecasDoForno(pecas);
-    setJaRegistradas(registradas);
-  }, [ovenId, orderId, user]);
-
-  useFocusEffect(
-    useCallback(() => {
-      carregar();
-    }, [carregar]),
-  );
-
-  function adicionarItem() {
-    if (!partId || !servico) {
-      setErro('Escolha a peça e o tipo de serviço.');
-      return;
-    }
-    setErro(null);
-    setPendentes((atual) => [...atual, { partId, serviceType: servico, observation: observacao }]);
-    setPartId(null);
-    setServico(null);
-    setObservacao('');
-  }
-
-  function removerPendente(index: number) {
-    setPendentes((atual) => atual.filter((_, i) => i !== index));
-  }
-
-  async function salvarTudo() {
-    if (!pendentes.length) {
-      setErro('Adicione ao menos uma peça antes de salvar.');
-      return;
-    }
-    setSalvando(true);
-    try {
-      await maintenanceUseCase.register(user!.enterpriseId, orderId, ovenId, pendentes);
-      router.back();
-    } finally {
-      setSalvando(false);
-    }
-  }
-
-  function nomePeca(id: number): string {
-    const peca = pecasDoForno.find((p) => p.id === id);
-    return peca ? `${peca.reference} · ${peca.description}` : `Peça ${id}`;
-  }
+  const {
+    pecasDoForno,
+    jaRegistradas,
+    partId,
+    setPartId,
+    servico,
+    setServico,
+    observacao,
+    setObservacao,
+    pendentes,
+    adicionarItem,
+    removerPendente,
+    salvando,
+    erro,
+    salvarTudo,
+    nomePeca,
+  } = useOrderOvenMaintenance();
 
   return (
     <Screen>

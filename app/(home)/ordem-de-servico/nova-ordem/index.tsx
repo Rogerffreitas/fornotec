@@ -1,90 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
 import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { EmptyState } from '../../../../components/EmptyState';
 import { PriorityChip } from '../../../../components/PriorityChip';
-import { Store } from '../../../../domain/entities/Store';
-import { Oven } from '../../../../domain/entities/Oven';
-import { WORK_ORDER_PRIORITIES, WorkOrderPriority } from '../../../../domain/types';
-import { storeUseCase, ovenUseCase, workOrderUseCase } from '../../../../infra/ioc/container';
+import { WORK_ORDER_PRIORITIES } from '../../../../domain/types';
 import { colors, spacing, radius } from '../../../../components/theme';
-import { useAuth } from '@/context/AuthContext';
-
-interface SelecaoForno {
-  selecionado: boolean;
-  observacao: string;
-}
+import { useNewWorkOrder } from './useNewWorkOrder';
 
 export default function NovaOrdem() {
-  const { user } = useAuth();
-  const [lojas, setLojas] = useState<Store[]>([]);
-  const [storeId, setStoreId] = useState<number | null>(null);
-  const [prioridade, setPrioridade] = useState<WorkOrderPriority>('media');
-  const [fornos, setFornos] = useState<Oven[]>([]);
-  const [selecoes, setSelecoes] = useState<Record<number, SelecaoForno>>({});
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
-
-  useEffect(() => {
-    storeUseCase.findAll(user!.enterpriseId).then((resultado) => {
-      setLojas(resultado);
-      setStoreId(resultado[0]?.id ?? null);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (!storeId) return;
-    ovenUseCase.findByStore(user!.enterpriseId, storeId).then((resultado) => {
-      setFornos(resultado);
-      setSelecoes({});
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeId]);
-
-  function alternarForno(ovenId: number) {
-    setSelecoes((atual) => {
-      const anterior = atual[ovenId];
-      return {
-        ...atual,
-        [ovenId]: { selecionado: !anterior?.selecionado, observacao: anterior?.observacao ?? '' },
-      };
-    });
-  }
-
-  function mudarObservacao(ovenId: number, texto: string) {
-    setSelecoes((atual) => ({ ...atual, [ovenId]: { ...atual[ovenId], observacao: texto } }));
-  }
-
-  const fornosSelecionados = Object.entries(selecoes)
-    .filter(([, v]) => v.selecionado)
-    .map(([ovenId, v]) => ({ ovenId: Number(ovenId), observation: v.observacao }));
-
-  async function salvar() {
-    if (!storeId || !fornosSelecionados.length) {
-      setErro('Escolha a loja e ao menos um forno para a ordem.');
-      return;
-    }
-    if (fornosSelecionados.some((f) => !f.observation.trim())) {
-      setErro('Preencha a observação de cada forno selecionado.');
-      return;
-    }
-    setErro(null);
-    setSalvando(true);
-    try {
-      const { order } = await workOrderUseCase.create(
-        user!.enterpriseId,
-        { storeId, priority: prioridade },
-        fornosSelecionados,
-      );
-      router.replace(`/ordem-de-servico/${order.id}`);
-    } finally {
-      setSalvando(false);
-    }
-  }
+  const {
+    lojas,
+    storeId,
+    setStoreId,
+    prioridade,
+    setPrioridade,
+    fornos,
+    selecoes,
+    alternarForno,
+    mudarObservacao,
+    salvando,
+    erro,
+    valido,
+    salvar,
+  } = useNewWorkOrder();
 
   return (
     <Screen>
@@ -151,11 +91,7 @@ export default function NovaOrdem() {
           titulo="Criar ordem de serviço"
           onPress={salvar}
           carregando={salvando}
-          desabilitado={
-            !storeId ||
-            !fornosSelecionados.length ||
-            fornosSelecionados.some((f) => !f.observation.trim())
-          }
+          desabilitado={!valido}
           style={{ marginTop: spacing.sm, marginBottom: spacing.xl }}
         />
       </ScrollView>

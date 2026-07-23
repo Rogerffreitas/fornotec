@@ -2,63 +2,20 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { Screen } from '../../components/Screen';
-import { useAuth } from '../../context/AuthContext';
 import { colors, spacing, radius } from '../../components/theme';
-import { Modulo, podeAcessarModulo } from '../../domain/types/permissions';
-
-const MODULOS: { titulo: string; descricao: string; rota: string; modulo: Modulo }[] = [
-  { titulo: 'Lojas', descricao: 'Cadastro de lojas', rota: '/lojas', modulo: 'lojas' },
-  {
-    titulo: 'Ordens de Serviço',
-    descricao: 'Abrir e acompanhar ordens',
-    rota: '/ordem-de-servico',
-    modulo: 'ordem-de-servico',
-  },
-  { titulo: 'Peças', descricao: 'Cadastro de peças', rota: '/pecas', modulo: 'pecas' },
-  { titulo: 'Fornos', descricao: 'Cadastro de fornos por loja', rota: '/fornos', modulo: 'fornos' },
-  {
-    titulo: 'Peças do Forno',
-    descricao: 'Associar peças aos fornos',
-    rota: '/pecas-forno',
-    modulo: 'pecas-forno',
-  },
-  {
-    titulo: 'Manutenções',
-    descricao: 'Histórico de manutenções',
-    rota: '/manutencao',
-    modulo: 'manutencao',
-  },
-  {
-    titulo: 'Relatórios',
-    descricao: 'Relatórios analítico e sintético por loja',
-    rota: '/reports',
-    modulo: 'relatorios',
-  },
-];
+import { useDashboard } from './useDashboard';
 
 export default function Home() {
-  const { user, logout } = useAuth();
-  const modulosVisiveis = MODULOS.filter((m) => podeAcessarModulo(user!.role, m.modulo));
+  const { userName, roleLabel, modulosVisiveis, sair } = useDashboard();
 
   return (
     <Screen>
       <View style={styles.cabecalho}>
         <View>
-          <Text style={styles.saudacao}>Olá, {user?.name ?? ''}</Text>
-          <Text style={styles.subtitulo}>
-            {user?.role === 'TECHNICAL'
-              ? 'Perfil: técnico'
-              : user?.role === 'CLIENT'
-                ? 'Perfil: cliente'
-                : ''}
-          </Text>
+          <Text style={styles.saudacao}>Olá, {userName}</Text>
+          <Text style={styles.subtitulo}>{roleLabel}</Text>
         </View>
-        <Pressable
-          onPress={() => {
-            logout();
-            router.replace('/login');
-          }}
-        >
+        <Pressable onPress={sair}>
           <Text style={styles.sair}>Sair</Text>
         </Pressable>
       </View>

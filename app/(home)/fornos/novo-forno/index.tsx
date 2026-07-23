@@ -1,63 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
 import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
-import { Store } from '../../../../domain/entities/Store';
-import { storeUseCase, ovenUseCase } from '../../../../infra/ioc/container';
 import { OVEN_DESCRIPTION_MAX_LENGTH } from '../../../../domain/entities/Oven';
 import { colors, spacing, radius } from '../../../../components/theme';
-import { useAuth } from '@/context/AuthContext';
+import { useNewOven } from './useNewOven';
 
 export default function NovoForno() {
-  const { user } = useAuth();
-  const [lojas, setLojas] = useState<Store[]>([]);
-  const [storeId, setStoreId] = useState<number | null>(null);
-  const [assetNumber, setAssetNumber] = useState('');
-  const [description, setDescription] = useState('');
-  const [mark, setMark] = useState('');
-  const [voltage, setVoltage] = useState('');
-  const [power, setPower] = useState('');
-  const [reference, setReference] = useState('');
-  const [maintenanceFrequency, setMaintenanceFrequency] = useState('90');
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
-
-  useEffect(() => {
-    storeUseCase.findAll(user!.enterpriseId).then((resultado) => {
-      setLojas(resultado);
-      setStoreId(resultado[0]?.id ?? null);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const frequenciaNumero = Number(maintenanceFrequency);
-  const valido = storeId && description.trim() && frequenciaNumero > 0;
-
-  async function salvar() {
-    if (!valido || !storeId) {
-      setErro('Escolha a loja, informe a descrição e a periodicidade de manutenção.');
-      return;
-    }
-    setErro(null);
-    setSalvando(true);
-    try {
-      await ovenUseCase.create(user!.enterpriseId, {
-        storeId,
-        assetNumber: assetNumber.trim() || undefined,
-        description: description.trim(),
-        mark: mark.trim() || undefined,
-        voltage: voltage.trim() || undefined,
-        power: power.trim() || undefined,
-        reference: reference.trim() || undefined,
-        maintenanceFrequency: frequenciaNumero,
-      });
-      router.back();
-    } finally {
-      setSalvando(false);
-    }
-  }
+  const {
+    lojas,
+    storeId,
+    setStoreId,
+    assetNumber,
+    setAssetNumber,
+    description,
+    setDescription,
+    mark,
+    setMark,
+    voltage,
+    setVoltage,
+    power,
+    setPower,
+    reference,
+    setReference,
+    maintenanceFrequency,
+    setMaintenanceFrequency,
+    salvando,
+    erro,
+    salvar,
+  } = useNewOven();
 
   return (
     <Screen>

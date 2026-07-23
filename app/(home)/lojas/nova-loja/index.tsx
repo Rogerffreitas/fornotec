@@ -1,52 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Text } from 'react-native';
-import { router } from 'expo-router';
 import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
-import { storeUseCase } from '../../../../infra/ioc/container';
 import { STORE_FIELD_MAX_LENGTH } from '../../../../domain/entities/Store';
 import { colors, spacing } from '../../../../components/theme';
-import { useAuth } from '@/context/AuthContext';
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { useNewStore } from './useNewStore';
 
 export default function NovaLoja() {
-  const { user } = useAuth();
-  const [description, setDescription] = useState('');
-  const [address, setAddress] = useState('');
-  const [contactName, setContactName] = useState('');
-  const [contactNumber, setContactNumber] = useState('');
-  const [email, setEmail] = useState('');
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
-
-  const valido = description.trim() && address.trim();
-
-  async function salvar() {
-    if (!valido) {
-      setErro('Descrição e endereço são obrigatórios.');
-      return;
-    }
-    if (email.trim() && !EMAIL_REGEX.test(email.trim())) {
-      setErro('Informe um e-mail válido.');
-      return;
-    }
-    setErro(null);
-    setSalvando(true);
-    try {
-      await storeUseCase.create(user!.enterpriseId, {
-        description: description.trim(),
-        address: address.trim(),
-        contactName: contactName.trim() || undefined,
-        contactNumber: contactNumber.trim() || undefined,
-        email: email.trim() || undefined,
-      });
-      router.back();
-    } finally {
-      setSalvando(false);
-    }
-  }
+  const {
+    description,
+    setDescription,
+    address,
+    setAddress,
+    contactName,
+    setContactName,
+    contactNumber,
+    setContactNumber,
+    email,
+    setEmail,
+    salvando,
+    erro,
+    salvar,
+  } = useNewStore();
 
   return (
     <Screen>

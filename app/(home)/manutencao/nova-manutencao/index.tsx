@@ -1,107 +1,39 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { router, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { EmptyState } from '../../../../components/EmptyState';
 import { ServiceTypeChip } from '../../../../components/ServiceTypeChip';
-import { WorkOrder, WorkOrderOven } from '../../../../domain/entities/WorkOrder';
-import { Oven } from '../../../../domain/entities/Oven';
-import { Store } from '../../../../domain/entities/Store';
-import { Part } from '../../../../domain/entities/Part';
-import { SERVICE_TYPES, ServiceType } from '../../../../domain/types';
-import {
-  workOrderUseCase,
-  ovenUseCase,
-  storeUseCase,
-  partUseCase,
-  maintenanceUseCase,
-} from '../../../../infra/ioc/container';
+import { SERVICE_TYPES } from '../../../../domain/types';
 import { colors, spacing, radius } from '../../../../components/theme';
-import { useAuth } from '@/context/AuthContext';
+import { useNewMaintenanceWizard } from './useNewMaintenanceWizard';
 
 function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR');
 }
 
 export default function NovaManutencao() {
-  const { user } = useAuth();
-  const [ordens, setOrdens] = useState<WorkOrder[]>([]);
-  const [lojasPorId, setLojasPorId] = useState<Record<number, Store>>({});
-  const [orderId, setOrderId] = useState<number | null>(null);
-
-  const [fornosDaOrdem, setFornosDaOrdem] = useState<Oven[]>([]);
-  const [ovenId, setOvenId] = useState<number | null>(null);
-
-  const [pecasDoForno, setPecasDoForno] = useState<Part[]>([]);
-  const [partId, setPartId] = useState<number | null>(null);
-
-  const [servico, setServico] = useState<ServiceType | null>(null);
-  const [observacao, setObservacao] = useState('');
-
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
-
-  useEffect(() => {
-    Promise.all([
-      workOrderUseCase.findAll(user!.enterpriseId),
-      storeUseCase.findAll(user!.enterpriseId),
-    ]).then(([listaOrdens, lojas]) => {
-      setOrdens(listaOrdens.filter((o) => o.status === 'pendente'));
-      setLojasPorId(Object.fromEntries(lojas.map((l) => [l.id, l])));
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (!orderId) {
-      setFornosDaOrdem([]);
-      return;
-    }
-    workOrderUseCase.findOvensOfOrder(user!.enterpriseId, orderId).then(async (orderOvens) => {
-      const fornos = await Promise.all(
-        orderOvens.map((oo) => ovenUseCase.findById(user!.enterpriseId, oo.ovenId)),
-      );
-      setFornosDaOrdem(fornos.filter((f): f is Oven => !!f));
-    });
-    setOvenId(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId]);
-
-  useEffect(() => {
-    if (!ovenId) {
-      setPecasDoForno([]);
-      return;
-    }
-    ovenUseCase.findPartsOfOven(user!.enterpriseId, ovenId).then(async (associacoes) => {
-      setPecasDoForno(
-        await partUseCase.findByIds(
-          user!.enterpriseId,
-          associacoes.map((a) => a.partId),
-        ),
-      );
-    });
-    setPartId(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ovenId]);
-
-  async function salvar() {
-    if (!orderId || !ovenId || !partId || !servico) {
-      setErro('Escolha a ordem, o forno, a peça e o status.');
-      return;
-    }
-    setErro(null);
-    setSalvando(true);
-    try {
-      await maintenanceUseCase.register(user!.enterpriseId, orderId, ovenId, [
-        { partId, serviceType: servico, observation: observacao },
-      ]);
-      router.back();
-    } finally {
-      setSalvando(false);
-    }
-  }
+  const {
+    ordens,
+    lojasPorId,
+    orderId,
+    setOrderId,
+    fornosDaOrdem,
+    ovenId,
+    setOvenId,
+    pecasDoForno,
+    partId,
+    setPartId,
+    servico,
+    setServico,
+    observacao,
+    setObservacao,
+    salvando,
+    erro,
+    salvar,
+  } = useNewMaintenanceWizard();
 
   return (
     <Screen>

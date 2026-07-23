@@ -1,7 +1,6 @@
-import React, { useCallback, useState } from 'react';
-import { View, Text, Platform, Alert, StyleSheet } from 'react-native';
-import { useLocalSearchParams, Stack, router } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Stack, router } from 'expo-router';
 import { Screen } from '../../../../components/Screen';
 import { ListRow } from '../../../../components/ListRow';
 import { PriorityChip } from '../../../../components/PriorityChip';
@@ -9,120 +8,29 @@ import { WorkOrderStatusBadge } from '../../../../components/WorkOrderStatusBadg
 import { EmptyState } from '../../../../components/EmptyState';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { AssinaturaModal } from '../../../../components/AssinaturaModal';
-import { WorkOrder } from '../../../../domain/entities/WorkOrder';
-import { AssinaturaCliente } from '../../../../domain/entities/Signature';
-import { Oven } from '../../../../domain/entities/Oven';
-import { Store } from '../../../../domain/entities/Store';
-import { WorkOrderOven } from '../../../../domain/entities/WorkOrder';
-import {
-  workOrderUseCase,
-  ovenUseCase,
-  storeUseCase,
-  maintenanceUseCase,
-  partUseCase,
-  pdfGenerator,
-} from '../../../../infra/ioc/container';
-import { buildWorkOrderPdfDocument } from '../../../../infra/pdf/templates/workOrderPdfTemplate';
-import { baixarPdfNaWeb } from '../../../../infra/pdf/baixarPdfNaWeb';
-import { podeGerenciarOrdem } from '../../../../domain/types/permissions';
 import { colors, spacing } from '../../../../components/theme';
-import { useAuth } from '@/context/AuthContext';
+import { useWorkOrder } from './useWorkOrder';
 
 function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR');
 }
 
 export default function DetalheOrdem() {
-  const { user } = useAuth();
-  const { ordemId } = useLocalSearchParams<{ ordemId: string }>();
-  const id = Number(ordemId);
-
-  const [ordem, setOrdem] = useState<WorkOrder | null>(null);
-  const [loja, setLoja] = useState<Store | null>(null);
-  const [itens, setItens] = useState<{ orderOven: WorkOrderOven; oven: Oven }[]>([]);
-  const [finalizando, setFinalizando] = useState(false);
-  const [cancelando, setCancelando] = useState(false);
-  const [gerandoPdf, setGerandoPdf] = useState(false);
-  const [modalAssinaturaVisivel, setModalAssinaturaVisivel] = useState(false);
-
-  const carregar = useCallback(async () => {
-    const enterpriseId = user!.enterpriseId;
-    const ordemAtual = await workOrderUseCase.findById(enterpriseId, id);
-    setOrdem(ordemAtual ?? null);
-    if (ordemAtual) setLoja((await storeUseCase.findById(enterpriseId, ordemAtual.storeId)) ?? null);
-
-    const orderOvens = await workOrderUseCase.findOvensOfOrder(enterpriseId, id);
-    const comFornos = await Promise.all(
-      orderOvens.map(async (oo) => ({
-        orderOven: oo,
-        oven: (await ovenUseCase.findById(enterpriseId, oo.ovenId))!,
-      })),
-    );
-    setItens(comFornos.filter((i) => i.oven));
-  }, [id, user]);
-
-  useFocusEffect(
-    useCallback(() => {
-      carregar();
-    }, [carregar]),
-  );
-
-  async function finalizar(assinatura: AssinaturaCliente) {
-    setFinalizando(true);
-    try {
-      await workOrderUseCase.finalize(user!.enterpriseId, id, assinatura);
-      setModalAssinaturaVisivel(false);
-      await carregar();
-    } finally {
-      setFinalizando(false);
-    }
-  }
-
-  async function cancelar() {
-    setCancelando(true);
-    try {
-      await workOrderUseCase.cancel(user!.enterpriseId, id);
-      await carregar();
-    } finally {
-      setCancelando(false);
-    }
-  }
-
-  async function baixarPdf() {
-    if (!ordem) return;
-    setGerandoPdf(true);
-    try {
-      const enterpriseId = user!.enterpriseId;
-      const manutencoes = await maintenanceUseCase.findByOrder(enterpriseId, id);
-      const partIds = [...new Set(manutencoes.map((m) => m.partId))];
-      const pecas = partIds.length > 0 ? await partUseCase.findByIds(enterpriseId, partIds) : [];
-
-      const documento = buildWorkOrderPdfDocument({
-        ordem,
-        loja,
-        enterpriseName: user!.enterpriseName,
-        pecas,
-        itens: itens.map(({ orderOven, oven }) => ({
-          orderOven,
-          oven,
-          manutencoes: manutencoes.filter((m) => m.ovenId === oven.id),
-        })),
-      });
-      const bytes = await pdfGenerator.generate(documento);
-      if (Platform.OS === 'web') {
-        await baixarPdfNaWeb(bytes, `ordem-servico-${ordem.id}.pdf`);
-      } else {
-        Alert.alert(
-          'Disponível na web',
-          'O download de PDF está disponível na versão web do app por enquanto.',
-        );
-      }
-    } finally {
-      setGerandoPdf(false);
-    }
-  }
-
-  const podeGerenciar = podeGerenciarOrdem(user!.role);
+  const {
+    id,
+    ordem,
+    itens,
+    podeGerenciar,
+    finalizando,
+    cancelando,
+    gerandoPdf,
+    modalAssinaturaVisivel,
+    abrirModalAssinatura,
+    fecharModalAssinatura,
+    finalizar,
+    cancelar,
+    baixarPdf,
+  } = useWorkOrder();
 
   return (
     <Screen>
@@ -170,7 +78,7 @@ export default function DetalheOrdem() {
           {podeGerenciar ? (
             <PrimaryButton
               titulo="Finalizar ordem"
-              onPress={() => setModalAssinaturaVisivel(true)}
+              onPress={abrirModalAssinatura}
               style={{ flex: 1 }}
             />
           ) : null}
@@ -187,7 +95,7 @@ export default function DetalheOrdem() {
       <AssinaturaModal
         visivel={modalAssinaturaVisivel}
         carregando={finalizando}
-        onCancelar={() => setModalAssinaturaVisivel(false)}
+        onCancelar={fecharModalAssinatura}
         onConfirmar={finalizar}
       />
     </Screen>

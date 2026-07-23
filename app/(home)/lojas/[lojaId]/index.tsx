@@ -1,80 +1,32 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { Text, ScrollView, StyleSheet } from 'react-native';
-import { useLocalSearchParams, router, Stack } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
+import { Stack } from 'expo-router';
 import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { EmptyState } from '../../../../components/EmptyState';
 import { STORE_FIELD_MAX_LENGTH } from '../../../../domain/entities/Store';
-import { storeUseCase } from '../../../../infra/ioc/container';
 import { colors, spacing } from '../../../../components/theme';
-import { useAuth } from '@/context/AuthContext';
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { useEditStore } from './useEditStore';
 
 export default function EditarLoja() {
-  const { user } = useAuth();
-  const { lojaId } = useLocalSearchParams<{ lojaId: string }>();
-  const id = Number(lojaId);
-
-  const [carregado, setCarregado] = useState(false);
-  const [naoEncontrada, setNaoEncontrada] = useState(false);
-  const [description, setDescription] = useState('');
-  const [address, setAddress] = useState('');
-  const [contactName, setContactName] = useState('');
-  const [contactNumber, setContactNumber] = useState('');
-  const [email, setEmail] = useState('');
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
-
-  const carregar = useCallback(async () => {
-    const loja = await storeUseCase.findById(user!.enterpriseId, id);
-    if (!loja) {
-      setNaoEncontrada(true);
-      setCarregado(true);
-      return;
-    }
-    setDescription(loja.description);
-    setAddress(loja.address);
-    setContactName(loja.contactName ?? '');
-    setContactNumber(loja.contactNumber ?? '');
-    setEmail(loja.email ?? '');
-    setCarregado(true);
-  }, [id, user]);
-
-  useFocusEffect(
-    useCallback(() => {
-      carregar();
-    }, [carregar]),
-  );
-
-  const valido = description.trim() && address.trim();
-
-  async function salvar() {
-    if (!valido) {
-      setErro('Descrição e endereço são obrigatórios.');
-      return;
-    }
-    if (email.trim() && !EMAIL_REGEX.test(email.trim())) {
-      setErro('Informe um e-mail válido.');
-      return;
-    }
-    setErro(null);
-    setSalvando(true);
-    try {
-      await storeUseCase.update(user!.enterpriseId, id, {
-        description: description.trim(),
-        address: address.trim(),
-        contactName: contactName.trim() || undefined,
-        contactNumber: contactNumber.trim() || undefined,
-        email: email.trim() || undefined,
-      });
-      router.back();
-    } finally {
-      setSalvando(false);
-    }
-  }
+  const {
+    carregado,
+    naoEncontrada,
+    description,
+    setDescription,
+    address,
+    setAddress,
+    contactName,
+    setContactName,
+    contactNumber,
+    setContactNumber,
+    email,
+    setEmail,
+    salvando,
+    erro,
+    salvar,
+  } = useEditStore();
 
   if (carregado && naoEncontrada) {
     return (

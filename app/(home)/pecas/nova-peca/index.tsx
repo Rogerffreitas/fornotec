@@ -1,36 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
 import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
-import { LOCATIONS, LocationRef } from '../../../../domain/types';
-import { partUseCase } from '../../../../infra/ioc/container';
+import { LOCATIONS } from '../../../../domain/types';
 import { PART_FIELD_MAX_LENGTH } from '../../../../domain/entities/Part';
 import { colors, spacing, radius } from '../../../../components/theme';
-import { useAuth } from '@/context/AuthContext';
+import { useNewPart } from './useNewPart';
 
 export default function NovaPeca() {
-  const { user } = useAuth();
-  const [description, setDescription] = useState('');
-  const [location, setLocation] = useState<LocationRef | null>(null);
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
-
-  async function salvar() {
-    if (!description.trim() || !location) {
-      setErro('Preencha a descrição e escolha a localização.');
-      return;
-    }
-    setErro(null);
-    setSalvando(true);
-    try {
-      await partUseCase.create(user!.enterpriseId, { description: description.trim(), location });
-      router.back();
-    } finally {
-      setSalvando(false);
-    }
-  }
+  const { description, setDescription, location, setLocation, salvando, erro, salvar } =
+    useNewPart();
 
   return (
     <Screen>
