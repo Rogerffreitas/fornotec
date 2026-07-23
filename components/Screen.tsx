@@ -3,14 +3,21 @@ import { View, StyleSheet, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing, maxContentWidth } from './theme';
 
+interface Props {
+  children: React.ReactNode;
+  /** Barra de topo opcional, renderizada de ponta a ponta (fora do padding/largura máxima do conteúdo) — mesmo tratamento do cabeçalho nativo do Stack. */
+  cabecalho?: React.ReactNode;
+}
+
 /**
  * No web (destino: deploy no Netlify), o conteúdo fica centralizado com
  * largura máxima, para não esticar demais em telas de desktop. No mobile
  * ocupa a tela toda normalmente.
  */
-export function Screen({ children }: { children: React.ReactNode }) {
+export function Screen({ children, cabecalho }: Props) {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      {cabecalho}
       <View style={styles.centralizador}>
         <View style={styles.conteudo}>{children}</View>
       </View>

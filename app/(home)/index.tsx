@@ -11,26 +11,28 @@ export default function Home() {
   const { saudacao, userName, roleBadge, modulosVisiveis, sair } = useDashboard();
 
   return (
-    <Screen>
-      <View style={styles.cabecalho}>
-        <View>
-          <Text style={styles.saudacao}>
-            {saudacao}, <Text style={styles.nome}>{userName}</Text>
-          </Text>
-          {roleBadge ? (
-            <View style={styles.badgeWrapper}>
-              <Badge texto={roleBadge.texto} tom={roleBadge.tom} />
-            </View>
-          ) : null}
+    <Screen
+      cabecalho={
+        <View style={styles.cabecalho}>
+          <View>
+            <Text style={styles.saudacao}>
+              {saudacao}, <Text style={styles.nome}>{userName}</Text>
+            </Text>
+            {roleBadge ? (
+              <View style={styles.badgeWrapper}>
+                <Badge texto={roleBadge.texto} tom={roleBadge.tom} />
+              </View>
+            ) : null}
+          </View>
+          <Pressable
+            onPress={sair}
+            style={({ pressed }) => [styles.sairBotao, pressed && styles.sairBotaoPressionado]}
+          >
+            <Text style={styles.sair}>Sair</Text>
+          </Pressable>
         </View>
-        <Pressable
-          onPress={sair}
-          style={({ pressed }) => [styles.sairBotao, pressed && styles.sairBotaoPressionado]}
-        >
-          <Text style={styles.sair}>Sair</Text>
-        </Pressable>
-      </View>
-
+      }
+    >
       <View style={styles.grade}>
         {modulosVisiveis.map((m) => (
           <Pressable
@@ -56,9 +58,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     backgroundColor: colors.brand,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
   },
   saudacao: { fontSize: 20, fontWeight: '700', color: '#FFFFFF' },
   nome: { color: colors.primary },
