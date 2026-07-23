@@ -1,43 +1,15 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { FlatList } from 'react-native';
 import { router } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../../../components/Screen';
 import { FilterInput } from '../../../components/FilterInput';
 import { ListRow } from '../../../components/ListRow';
 import { EmptyState } from '../../../components/EmptyState';
-import { Oven } from '../../../domain/entities/Oven';
-import { Store } from '../../../domain/entities/Store';
-import { ovenUseCase, storeUseCase } from '../../../infra/ioc/container';
-import { useAuth } from '@/context/AuthContext';
+import { useOvensForParts } from './useOvensForParts';
 
 export default function PecasForno() {
-  const { user } = useAuth();
-  const [fornos, setFornos] = useState<Oven[]>([]);
-  const [lojasPorId, setLojasPorId] = useState<Record<number, Store>>({});
-  const [filtro, setFiltro] = useState('');
-  const [carregando, setCarregando] = useState(true);
-
-  const carregar = useCallback(async () => {
-    setCarregando(true);
-    const [listaFornos, listaLojas] = await Promise.all([
-      ovenUseCase.findAll(user!.enterpriseId),
-      storeUseCase.findAll(user!.enterpriseId),
-    ]);
-    setFornos(listaFornos);
-    setLojasPorId(Object.fromEntries(listaLojas.map((l) => [l.id, l])));
-    setCarregando(false);
-  }, [user]);
-
-  useFocusEffect(
-    useCallback(() => {
-      carregar();
-    }, [carregar]),
-  );
-
-  const fornosFiltrados = filtro.trim()
-    ? fornos.filter((f) => f.description.toLowerCase().includes(filtro.trim().toLowerCase()))
-    : fornos;
+  const { fornosFiltrados, lojasPorId, filtro, setFiltro, carregando, recarregar } =
+    useOvensForParts();
 
   return (
     <Screen>
@@ -50,7 +22,7 @@ export default function PecasForno() {
         data={fornosFiltrados}
         keyExtractor={(item) => String(item.id)}
         refreshing={carregando}
-        onRefresh={carregar}
+        onRefresh={recarregar}
         ListEmptyComponent={<EmptyState texto="Nenhum forno cadastrado ainda." />}
         renderItem={({ item }) => (
           <ListRow

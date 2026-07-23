@@ -1,17 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import { Text, Pressable, FlatList, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../../../components/Screen';
 import { FilterInput } from '../../../components/FilterInput';
 import { ListRow } from '../../../components/ListRow';
 import { EmptyState } from '../../../components/EmptyState';
 import { PrimaryButton } from '../../../components/PrimaryButton';
-import { Store } from '../../../domain/entities/Store';
-import { Oven } from '../../../domain/entities/Oven';
-import { storeUseCase, ovenUseCase } from '../../../infra/ioc/container';
 import { colors, spacing, radius } from '../../../components/theme';
-import { useAuth } from '@/context/AuthContext';
+import { useOvens } from './useOvens';
 
 function formatarData(iso: string | null): string {
   if (!iso) return '—';
@@ -19,36 +15,8 @@ function formatarData(iso: string | null): string {
 }
 
 export default function Fornos() {
-  const { user } = useAuth();
-  const [lojas, setLojas] = useState<Store[]>([]);
-  const [storeId, setStoreId] = useState<number | null>(null);
-  const [fornos, setFornos] = useState<Oven[]>([]);
-  const [filtro, setFiltro] = useState('');
-  const [carregando, setCarregando] = useState(true);
-
-  useEffect(() => {
-    storeUseCase.findAll(user!.enterpriseId).then((resultado) => {
-      setLojas(resultado);
-      setStoreId((atual) => atual ?? resultado[0]?.id ?? null);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const carregar = useCallback(
-    async (id: number, texto: string) => {
-      setCarregando(true);
-      setFornos(await ovenUseCase.findByStore(user!.enterpriseId, id, texto));
-      setCarregando(false);
-    },
-    [user],
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      if (storeId) carregar(storeId, filtro);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [storeId]),
-  );
+  const { lojas, storeId, setStoreId, fornos, filtro, handleFiltro, carregando, recarregar } =
+    useOvens();
 
   return (
     <Screen>
@@ -73,10 +41,7 @@ export default function Fornos() {
 
       <FilterInput
         valor={filtro}
-        aoMudar={(t) => {
-          setFiltro(t);
-          if (storeId) carregar(storeId, t);
-        }}
+        aoMudar={handleFiltro}
         placeholder="Filtrar por descrição ou patrimônio..."
       />
 
@@ -85,7 +50,7 @@ export default function Fornos() {
         data={fornos}
         keyExtractor={(item) => String(item.id)}
         refreshing={carregando}
-        onRefresh={() => storeId && carregar(storeId, filtro)}
+        onRefresh={recarregar}
         ListEmptyComponent={<EmptyState texto="Nenhum forno cadastrado para esta loja." />}
         renderItem={({ item }) => (
           <ListRow

@@ -1,52 +1,23 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable, FlatList, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../../../components/Screen';
 import { ListRow } from '../../../components/ListRow';
 import { PriorityChip } from '../../../components/PriorityChip';
 import { WorkOrderStatusBadge } from '../../../components/WorkOrderStatusBadge';
 import { EmptyState } from '../../../components/EmptyState';
 import { PrimaryButton } from '../../../components/PrimaryButton';
-import { WorkOrder } from '../../../domain/entities/WorkOrder';
 import { Store } from '../../../domain/entities/Store';
-import { workOrderUseCase, storeUseCase } from '../../../infra/ioc/container';
 import { colors, spacing, radius } from '../../../components/theme';
-import { useAuth } from '@/context/AuthContext';
+import { useWorkOrders } from './useWorkOrders';
 
 function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR');
 }
 
 export default function OrdensDeServico() {
-  const { user } = useAuth();
-  const [lojas, setLojas] = useState<Store[]>([]);
-  const [lojaFiltro, setLojaFiltro] = useState<number | null>(null);
-  const [ordens, setOrdens] = useState<WorkOrder[]>([]);
-  const [carregando, setCarregando] = useState(true);
-
-  useEffect(() => {
-    storeUseCase.findAll(user!.enterpriseId).then(setLojas);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const carregar = useCallback(
-    async (storeId: number | null) => {
-      setCarregando(true);
-      setOrdens(await workOrderUseCase.findWithFilter(user!.enterpriseId, storeId ?? undefined));
-      setCarregando(false);
-    },
-    [user],
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      carregar(lojaFiltro);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lojaFiltro]),
-  );
-
-  const lojasPorId = Object.fromEntries(lojas.map((l) => [l.id, l]));
+  const { ordens, lojas, lojasPorId, lojaFiltro, setLojaFiltro, carregando, recarregar } =
+    useWorkOrders();
 
   return (
     <Screen>
@@ -77,7 +48,7 @@ export default function OrdensDeServico() {
         data={ordens}
         keyExtractor={(item) => String(item.id)}
         refreshing={carregando}
-        onRefresh={() => carregar(lojaFiltro)}
+        onRefresh={recarregar}
         ListEmptyComponent={<EmptyState texto="Nenhuma ordem de serviço encontrada." />}
         renderItem={({ item }) => (
           <ListRow

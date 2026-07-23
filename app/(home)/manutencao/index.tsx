@@ -1,59 +1,22 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { FlatList, View, Text, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../../../components/Screen';
 import { ListRow } from '../../../components/ListRow';
 import { PriorityChip } from '../../../components/PriorityChip';
 import { WorkOrderStatusBadge } from '../../../components/WorkOrderStatusBadge';
 import { EmptyState } from '../../../components/EmptyState';
 import { PrimaryButton } from '../../../components/PrimaryButton';
-import { WorkOrder } from '../../../domain/entities/WorkOrder';
-import { Store } from '../../../domain/entities/Store';
-import { workOrderUseCase, storeUseCase, maintenanceUseCase } from '../../../infra/ioc/container';
 import { colors, spacing, radius } from '../../../components/theme';
-import { useAuth } from '@/context/AuthContext';
+import { useMaintenanceOrders } from './useMaintenanceOrders';
 
 function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR');
 }
 
 export default function Manutencoes() {
-  const { user } = useAuth();
-  const [lojas, setLojas] = useState<Store[]>([]);
-  const [lojaFiltro, setLojaFiltro] = useState<number | null>(null);
-  const [ordens, setOrdens] = useState<WorkOrder[]>([]);
-  const [carregando, setCarregando] = useState(true);
-
-  const carregar = useCallback(
-    async (storeId: number | null) => {
-      setCarregando(true);
-      const enterpriseId = user!.enterpriseId;
-      const [listaOrdens, listaLojas, manutencoes] = await Promise.all([
-        workOrderUseCase.findWithFilter(enterpriseId, storeId ?? undefined),
-        storeUseCase.findAll(enterpriseId),
-        maintenanceUseCase.findAll(enterpriseId),
-      ]);
-      const ordensComManutencao = new Set(manutencoes.map((m) => m.orderId));
-      setOrdens(
-        listaOrdens.filter(
-          (o) => o.status === 'finalizada' || ordensComManutencao.has(o.id),
-        ),
-      );
-      setLojas(listaLojas);
-      setCarregando(false);
-    },
-    [user],
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      carregar(lojaFiltro);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lojaFiltro]),
-  );
-
-  const lojasPorId = Object.fromEntries(lojas.map((l) => [l.id, l]));
+  const { ordens, lojas, lojasPorId, lojaFiltro, setLojaFiltro, carregando, recarregar } =
+    useMaintenanceOrders();
 
   return (
     <Screen>
@@ -87,7 +50,7 @@ export default function Manutencoes() {
         data={ordens}
         keyExtractor={(item) => String(item.id)}
         refreshing={carregando}
-        onRefresh={() => carregar(lojaFiltro)}
+        onRefresh={recarregar}
         ListEmptyComponent={
           <EmptyState texto="Nenhuma ordem de serviço finalizada ou com manutenção registrada." />
         }

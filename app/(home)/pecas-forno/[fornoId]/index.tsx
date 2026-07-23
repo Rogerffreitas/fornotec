@@ -1,61 +1,15 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable, FlatList, StyleSheet } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../../../../components/Screen';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { EmptyState } from '../../../../components/EmptyState';
-import { Part } from '../../../../domain/entities/Part';
 import { findLocation } from '../../../../domain/types';
-import { partUseCase, ovenUseCase } from '../../../../infra/ioc/container';
 import { colors, spacing, radius } from '../../../../components/theme';
-import { useAuth } from '@/context/AuthContext';
+import { useOvenParts } from './useOvenParts';
 
 export default function PecasDoForno() {
-  const { user } = useAuth();
-  const { fornoId } = useLocalSearchParams<{ fornoId: string }>();
-  const id = Number(fornoId);
-
-  const [todasPecas, setTodasPecas] = useState<Part[]>([]);
-  const [idsJaLigados, setIdsJaLigados] = useState<number[]>([]);
-  const [selecionadas, setSelecionadas] = useState<number[]>([]);
-  const [salvando, setSalvando] = useState(false);
-
-  const carregar = useCallback(async () => {
-    const [todas, associacoes] = await Promise.all([
-      partUseCase.findAll(user!.enterpriseId),
-      ovenUseCase.findPartsOfOven(user!.enterpriseId, id),
-    ]);
-    setTodasPecas(todas);
-    setIdsJaLigados(associacoes.map((a) => a.partId));
-    setSelecionadas([]);
-  }, [id, user]);
-
-  useFocusEffect(
-    useCallback(() => {
-      carregar();
-    }, [carregar]),
-  );
-
-  function alternarSelecao(partId: number) {
-    setSelecionadas((atual) =>
-      atual.includes(partId) ? atual.filter((i) => i !== partId) : [...atual, partId],
-    );
-  }
-
-  async function salvar() {
-    if (!selecionadas.length) return;
-    setSalvando(true);
-    try {
-      await ovenUseCase.addPartsToOven(user!.enterpriseId, id, selecionadas);
-      await carregar();
-    } finally {
-      setSalvando(false);
-    }
-  }
-
-  const pecasJaLigadas = todasPecas.filter((p) => idsJaLigados.includes(p.id));
-  const pecasDisponiveis = todasPecas.filter((p) => !idsJaLigados.includes(p.id));
+  const { pecasJaLigadas, pecasDisponiveis, selecionadas, alternarSelecao, salvando, salvar } =
+    useOvenParts();
 
   return (
     <Screen>

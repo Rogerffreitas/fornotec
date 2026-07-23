@@ -1,23 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
 import { Screen } from '../../components/Screen';
 import { TextField } from '../../components/TextField';
 import { PrimaryButton } from '../../components/PrimaryButton';
-import { RoleToggle, LoginRole, LOGIN_ROLE_TO_ROLE } from '../../components/RoleToggle';
+import { RoleToggle } from '../../components/RoleToggle';
 import { colors, spacing, radius } from '../../components/theme';
-import { useAuth } from '@/context/AuthContext';
+import { useLoginForm } from './useLoginForm';
 
 export default function Login() {
-  const { login, loading, error } = useAuth();
-  const [role, setRole] = useState<LoginRole>('technician');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-
-  async function handleEntrar() {
-    const ok = await login(username, password, LOGIN_ROLE_TO_ROLE[role]);
-    if (ok) router.replace('/');
-  }
+  const { role, setRole, username, setUsername, password, setPassword, loading, error, handleEntrar } =
+    useLoginForm();
 
   return (
     <Screen>
