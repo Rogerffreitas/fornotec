@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { Screen } from '../../../components/Screen';
 import { ListRow } from '../../../components/ListRow';
@@ -7,8 +7,9 @@ import { PriorityChip } from '../../../components/PriorityChip';
 import { WorkOrderStatusBadge } from '../../../components/WorkOrderStatusBadge';
 import { EmptyState } from '../../../components/EmptyState';
 import { PrimaryButton } from '../../../components/PrimaryButton';
+import { FilterChip } from '../../../components/FilterChip';
 import { Store } from '../../../domain/entities/Store';
-import { colors, spacing, radius } from '../../../components/theme';
+import { colors, spacing } from '../../../components/theme';
 import { useWorkOrders } from './useWorkOrders';
 
 function formatarData(iso: string): string {
@@ -31,14 +32,12 @@ export default function OrdensDeServico() {
         renderItem={({ item }) => {
           const ativo = item.id === -1 ? lojaFiltro === null : lojaFiltro === item.id;
           return (
-            <Pressable
+            <FilterChip
+              texto={item.description}
+              selecionado={ativo}
               onPress={() => setLojaFiltro(item.id === -1 ? null : item.id)}
-              style={[styles.chip, ativo && styles.chipSelecionado]}
-            >
-              <Text style={[styles.chipTexto, ativo && styles.chipTextoSelecionado]}>
-                {item.description}
-              </Text>
-            </Pressable>
+              style={styles.chip}
+            />
           );
         }}
       />
@@ -85,16 +84,5 @@ const styles = StyleSheet.create({
   chipsLista: { flexGrow: 0, marginBottom: spacing.md },
   lista: { flex: 1 },
   badges: { flexDirection: 'row', gap: spacing.xs, flexWrap: 'wrap', justifyContent: 'flex-end' },
-  chip: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
-    marginRight: spacing.sm,
-  },
-  chipSelecionado: { backgroundColor: colors.highlight, borderColor: colors.primary },
-  chipTexto: { fontSize: 13, color: colors.text },
-  chipTextoSelecionado: { color: colors.primaryDark, fontWeight: '600' },
+  chip: { marginRight: spacing.sm },
 });

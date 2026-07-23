@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Pressable, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
+import { FilterChip } from '../../../../components/FilterChip';
 import { LOCATIONS } from '../../../../domain/types';
 import { PART_FIELD_MAX_LENGTH } from '../../../../domain/entities/Part';
-import { colors, spacing, radius } from '../../../../components/theme';
+import { colors, spacing } from '../../../../components/theme';
 import { useNewPart } from './useNewPart';
 
 export default function NovaPeca() {
@@ -36,15 +37,12 @@ export default function NovaPeca() {
       <Text style={styles.rotulo}>Localização *</Text>
       <View style={styles.chips}>
         {LOCATIONS.map((loc) => (
-          <Pressable
+          <FilterChip
             key={loc.ref}
+            texto={loc.description}
+            selecionado={location === loc.ref}
             onPress={() => setLocation(loc.ref)}
-            style={[styles.chip, location === loc.ref && styles.chipSelecionado]}
-          >
-            <Text style={[styles.chipTexto, location === loc.ref && styles.chipTextoSelecionado]}>
-              {loc.description}
-            </Text>
-          </Pressable>
+          />
         ))}
       </View>
 
@@ -68,16 +66,5 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
-  chip: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  chipSelecionado: { backgroundColor: colors.highlight, borderColor: colors.primary },
-  chipTexto: { fontSize: 13, color: colors.text },
-  chipTextoSelecionado: { color: colors.primaryDark, fontWeight: '600' },
   erro: { color: colors.danger, marginBottom: spacing.md },
 });

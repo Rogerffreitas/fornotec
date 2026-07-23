@@ -6,6 +6,7 @@ import { TextField } from '../../../../../../components/TextField';
 import { PrimaryButton } from '../../../../../../components/PrimaryButton';
 import { EmptyState } from '../../../../../../components/EmptyState';
 import { ServiceTypeChip } from '../../../../../../components/ServiceTypeChip';
+import { FilterChip } from '../../../../../../components/FilterChip';
 import { SERVICE_TYPES } from '../../../../../../domain/types';
 import { colors, spacing, radius } from '../../../../../../components/theme';
 import { useOrderOvenMaintenance } from './useOrderOvenMaintenance';
@@ -56,15 +57,12 @@ export default function NovaManutencao() {
         ) : (
           <View style={styles.chips}>
             {pecasDoForno.map((p) => (
-              <Pressable
+              <FilterChip
                 key={p.id}
+                texto={`${p.reference} · ${p.description}`}
+                selecionado={partId === p.id}
                 onPress={() => setPartId(p.id)}
-                style={[styles.chip, partId === p.id && styles.chipSelecionado]}
-              >
-                <Text style={[styles.chipTexto, partId === p.id && styles.chipTextoSelecionado]}>
-                  {p.reference} · {p.description}
-                </Text>
-              </Pressable>
+              />
             ))}
           </View>
         )}
@@ -132,17 +130,6 @@ export default function NovaManutencao() {
 const styles = StyleSheet.create({
   secao: { fontSize: 13, fontWeight: '600', color: colors.textSecondary, marginBottom: spacing.sm },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
-  chip: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  chipSelecionado: { backgroundColor: colors.highlight, borderColor: colors.primary },
-  chipTexto: { fontSize: 13, color: colors.text },
-  chipTextoSelecionado: { color: colors.primaryDark, fontWeight: '600' },
   erro: { color: colors.danger, marginBottom: spacing.md },
   itemCabecalho: {
     flexDirection: 'row',

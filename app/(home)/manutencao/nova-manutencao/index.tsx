@@ -1,13 +1,14 @@
 import React from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { Stack } from 'expo-router';
 import { Screen } from '../../../../components/Screen';
 import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { EmptyState } from '../../../../components/EmptyState';
 import { ServiceTypeChip } from '../../../../components/ServiceTypeChip';
+import { FilterChip } from '../../../../components/FilterChip';
 import { SERVICE_TYPES } from '../../../../domain/types';
-import { colors, spacing, radius } from '../../../../components/theme';
+import { colors, spacing } from '../../../../components/theme';
 import { useNewMaintenanceWizard } from './useNewMaintenanceWizard';
 
 function formatarData(iso: string): string {
@@ -45,18 +46,12 @@ export default function NovaManutencao() {
         ) : (
           <View style={styles.chips}>
             {ordens.map((ordem) => (
-              <Pressable
+              <FilterChip
                 key={ordem.id}
+                texto={`OS #${ordem.id} · ${lojasPorId[ordem.storeId]?.description ?? ''} · ${formatarData(ordem.createdAt)}`}
+                selecionado={orderId === ordem.id}
                 onPress={() => setOrderId(ordem.id)}
-                style={[styles.chip, orderId === ordem.id && styles.chipSelecionado]}
-              >
-                <Text
-                  style={[styles.chipTexto, orderId === ordem.id && styles.chipTextoSelecionado]}
-                >
-                  OS #{ordem.id} · {lojasPorId[ordem.storeId]?.description ?? ''} ·{' '}
-                  {formatarData(ordem.createdAt)}
-                </Text>
-              </Pressable>
+              />
             ))}
           </View>
         )}
@@ -69,17 +64,12 @@ export default function NovaManutencao() {
             ) : (
               <View style={styles.chips}>
                 {fornosDaOrdem.map((forno) => (
-                  <Pressable
+                  <FilterChip
                     key={forno.id}
+                    texto={`${forno.assetNumber || 's/ patrimônio'} · ${forno.description}`}
+                    selecionado={ovenId === forno.id}
                     onPress={() => setOvenId(forno.id)}
-                    style={[styles.chip, ovenId === forno.id && styles.chipSelecionado]}
-                  >
-                    <Text
-                      style={[styles.chipTexto, ovenId === forno.id && styles.chipTextoSelecionado]}
-                    >
-                      {forno.assetNumber || 's/ patrimônio'} · {forno.description}
-                    </Text>
-                  </Pressable>
+                  />
                 ))}
               </View>
             )}
@@ -94,17 +84,12 @@ export default function NovaManutencao() {
             ) : (
               <View style={styles.chips}>
                 {pecasDoForno.map((peca) => (
-                  <Pressable
+                  <FilterChip
                     key={peca.id}
+                    texto={`${peca.reference} · ${peca.description}`}
+                    selecionado={partId === peca.id}
                     onPress={() => setPartId(peca.id)}
-                    style={[styles.chip, partId === peca.id && styles.chipSelecionado]}
-                  >
-                    <Text
-                      style={[styles.chipTexto, partId === peca.id && styles.chipTextoSelecionado]}
-                    >
-                      {peca.reference} · {peca.description}
-                    </Text>
-                  </Pressable>
+                  />
                 ))}
               </View>
             )}
@@ -156,16 +141,5 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
-  chip: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  chipSelecionado: { backgroundColor: colors.highlight, borderColor: colors.primary },
-  chipTexto: { fontSize: 13, color: colors.text },
-  chipTextoSelecionado: { color: colors.primaryDark, fontWeight: '600' },
   erro: { color: colors.danger, marginBottom: spacing.md },
 });

@@ -5,6 +5,7 @@ import { TextField } from '../../../../components/TextField';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { EmptyState } from '../../../../components/EmptyState';
 import { PriorityChip } from '../../../../components/PriorityChip';
+import { FilterChip } from '../../../../components/FilterChip';
 import { WORK_ORDER_PRIORITIES } from '../../../../domain/types';
 import { colors, spacing, radius } from '../../../../components/theme';
 import { useNewWorkOrder } from './useNewWorkOrder';
@@ -32,15 +33,12 @@ export default function NovaOrdem() {
         <Text style={styles.rotulo}>Loja</Text>
         <View style={styles.chips}>
           {lojas.map((loja) => (
-            <Pressable
+            <FilterChip
               key={loja.id}
+              texto={loja.description}
+              selecionado={storeId === loja.id}
               onPress={() => setStoreId(loja.id)}
-              style={[styles.chip, storeId === loja.id && styles.chipSelecionado]}
-            >
-              <Text style={[styles.chipTexto, storeId === loja.id && styles.chipTextoSelecionado]}>
-                {loja.description}
-              </Text>
-            </Pressable>
+            />
           ))}
         </View>
 
@@ -107,17 +105,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.lg },
-  chip: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  chipSelecionado: { backgroundColor: colors.highlight, borderColor: colors.primary },
-  chipTexto: { fontSize: 13, color: colors.text },
-  chipTextoSelecionado: { color: colors.primaryDark, fontWeight: '600' },
   fornoCard: {
     backgroundColor: colors.card,
     borderWidth: 1,

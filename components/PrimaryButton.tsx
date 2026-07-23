@@ -53,9 +53,9 @@ const styles = StyleSheet.create({
   },
   primaria: { backgroundColor: colors.primary },
   perigo: { backgroundColor: colors.danger },
-  secundaria: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  secundaria: { backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.primary },
   desabilitado: { opacity: 0.5 },
   pressionado: { opacity: 0.85 },
   textoClaro: { color: '#FFFFFF', fontWeight: '600', fontSize: 15 },
-  textoEscuro: { color: colors.text, fontWeight: '600', fontSize: 15 },
+  textoEscuro: { color: colors.primary, fontWeight: '600', fontSize: 15 },
 });

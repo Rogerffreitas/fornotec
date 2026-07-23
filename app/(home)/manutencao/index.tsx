@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, View, Text, Pressable, StyleSheet } from 'react-native';
+import { FlatList, View, Text, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { Screen } from '../../../components/Screen';
 import { ListRow } from '../../../components/ListRow';
@@ -7,7 +7,8 @@ import { PriorityChip } from '../../../components/PriorityChip';
 import { WorkOrderStatusBadge } from '../../../components/WorkOrderStatusBadge';
 import { EmptyState } from '../../../components/EmptyState';
 import { PrimaryButton } from '../../../components/PrimaryButton';
-import { colors, spacing, radius } from '../../../components/theme';
+import { FilterChip } from '../../../components/FilterChip';
+import { colors, spacing } from '../../../components/theme';
 import { useMaintenanceOrders } from './useMaintenanceOrders';
 
 function formatarData(iso: string): string {
@@ -22,26 +23,18 @@ export default function Manutencoes() {
     <Screen>
       <Text style={styles.rotulo}>Loja</Text>
       <View style={styles.chips}>
-        <Pressable
+        <FilterChip
+          texto="Todas"
+          selecionado={lojaFiltro === null}
           onPress={() => setLojaFiltro(null)}
-          style={[styles.chip, lojaFiltro === null && styles.chipSelecionado]}
-        >
-          <Text style={[styles.chipTexto, lojaFiltro === null && styles.chipTextoSelecionado]}>
-            Todas
-          </Text>
-        </Pressable>
+        />
         {lojas.map((loja) => (
-          <Pressable
+          <FilterChip
             key={loja.id}
+            texto={loja.description}
+            selecionado={lojaFiltro === loja.id}
             onPress={() => setLojaFiltro(loja.id)}
-            style={[styles.chip, lojaFiltro === loja.id && styles.chipSelecionado]}
-          >
-            <Text
-              style={[styles.chipTexto, lojaFiltro === loja.id && styles.chipTextoSelecionado]}
-            >
-              {loja.description}
-            </Text>
-          </Pressable>
+          />
         ))}
       </View>
 
@@ -88,15 +81,4 @@ const styles = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
   lista: { flex: 1 },
   badges: { flexDirection: 'row', gap: spacing.xs, flexWrap: 'wrap', justifyContent: 'flex-end' },
-  chip: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  chipSelecionado: { backgroundColor: colors.highlight, borderColor: colors.primary },
-  chipTexto: { fontSize: 13, color: colors.text },
-  chipTextoSelecionado: { color: colors.primaryDark, fontWeight: '600' },
 });
