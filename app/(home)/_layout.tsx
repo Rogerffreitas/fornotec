@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { Redirect, Stack, usePathname } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { moduloDaRota, podeAcessarModulo } from '../../domain/types/permissions';
+import { colors } from '../../components/theme';
 
 export default function Home() {
   const { user } = useAuth();
@@ -19,7 +20,14 @@ export default function Home() {
 
   return (
     <View style={{ flex: 1, flexDirection: 'row', width: '100%' }}>
-      <Stack>
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: colors.brand },
+          headerTintColor: '#FFFFFF',
+          headerTitleStyle: { fontWeight: '600' },
+          headerShadowVisible: false,
+        }}
+      >
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="fornos/index" options={{ title: 'Fornos' }} />
         <Stack.Screen name="fornos/novo-forno/index" options={{ title: 'Cadastrar Forno' }} />
