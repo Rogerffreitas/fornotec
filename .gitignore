@@ -2,5 +2,7 @@ node_modules
 .env
 package-lock.json
 .env.example
+dist
+.expo
 # Local Netlify folder
 .netlify
