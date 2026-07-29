@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "forno-app",
-    "slug": "forno-app",
+    "name": "Fornotec",
+    "slug": "fornotec",
     "scheme": "fornoapp",
     "version": "1.0.0",
     "orientation": "portrait",
