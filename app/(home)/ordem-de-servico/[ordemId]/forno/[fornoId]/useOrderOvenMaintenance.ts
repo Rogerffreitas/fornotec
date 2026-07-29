@@ -15,7 +15,7 @@ export interface UseOrderOvenMaintenanceResult {
   pecasDoForno: Part[];
   jaRegistradas: Maintenance[];
   partId: number | null;
-  setPartId: (id: number) => void;
+  setPartId: (id: number | null) => void;
   servico: ServiceType | null;
   setServico: (s: ServiceType) => void;
   observacao: string;

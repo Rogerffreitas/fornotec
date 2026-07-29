@@ -55,43 +55,49 @@ export default function NovaManutencao() {
         {pecasDoForno.length === 0 ? (
           <EmptyState texto="Este forno ainda não tem peças cadastradas. Cadastre em 'Peças do Forno'." />
         ) : (
-          <View style={styles.chips}>
-            {pecasDoForno.map((p) => (
-              <FilterChip
-                key={p.id}
-                texto={`${p.reference} · ${p.description}`}
-                selecionado={partId === p.id}
-                onPress={() => setPartId(p.id)}
-              />
-            ))}
-          </View>
+          pecasDoForno.map((p) => {
+            const selecionada = partId === p.id;
+            return (
+              <View key={p.id} style={styles.pecaBloco}>
+                <FilterChip
+                  texto={`${p.reference} · ${p.description}`}
+                  selecionado={selecionada}
+                  onPress={() => setPartId(selecionada ? null : p.id)}
+                  style={styles.pecaChip}
+                />
+                {selecionada ? (
+                  <View style={styles.pecaExpandida}>
+                    <Text style={styles.secao}>Serviço executado</Text>
+                    <View style={styles.chips}>
+                      {SERVICE_TYPES.map((s) => (
+                        <ServiceTypeChip
+                          key={s}
+                          tipo={s}
+                          selecionado={servico === s}
+                          onPress={() => setServico(s)}
+                        />
+                      ))}
+                    </View>
+
+                    <TextField
+                      rotulo="Observação"
+                      value={observacao}
+                      onChangeText={setObservacao}
+                      placeholder="O que foi feito nesta peça"
+                    />
+
+                    {erro ? <Text style={styles.erro}>{erro}</Text> : null}
+                    <PrimaryButton
+                      titulo="+ Adicionar peça à lista"
+                      variante="secundaria"
+                      onPress={adicionarItem}
+                    />
+                  </View>
+                ) : null}
+              </View>
+            );
+          })
         )}
-
-        <Text style={styles.secao}>Serviço executado</Text>
-        <View style={styles.chips}>
-          {SERVICE_TYPES.map((s) => (
-            <ServiceTypeChip
-              key={s}
-              tipo={s}
-              selecionado={servico === s}
-              onPress={() => setServico(s)}
-            />
-          ))}
-        </View>
-
-        <TextField
-          rotulo="Observação"
-          value={observacao}
-          onChangeText={setObservacao}
-          placeholder="O que foi feito nesta peça"
-        />
-
-        {erro ? <Text style={styles.erro}>{erro}</Text> : null}
-        <PrimaryButton
-          titulo="+ Adicionar peça à lista"
-          variante="secundaria"
-          onPress={adicionarItem}
-        />
 
         {pendentes.length > 0 ? (
           <>
@@ -115,6 +121,7 @@ export default function NovaManutencao() {
           </>
         ) : null}
 
+        {erro && partId === null ? <Text style={styles.erro}>{erro}</Text> : null}
         <PrimaryButton
           titulo="Salvar manutenção"
           onPress={salvarTudo}
@@ -131,6 +138,16 @@ const styles = StyleSheet.create({
   secao: { fontSize: 13, fontWeight: '600', color: colors.textSecondary, marginBottom: spacing.sm },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
   erro: { color: colors.danger, marginBottom: spacing.md },
+  pecaBloco: { marginBottom: spacing.sm },
+  pecaChip: { alignSelf: 'stretch' },
+  pecaExpandida: {
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginTop: spacing.sm,
+  },
   itemCabecalho: {
     flexDirection: 'row',
     alignItems: 'center',
