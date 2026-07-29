@@ -94,3 +94,17 @@ describe('PartRepositoryGatewayApi.create', () => {
     expect(result).toBe(created);
   });
 });
+
+describe('PartRepositoryGatewayApi.update', () => {
+  it('patches the part payload to /parts/:id', async () => {
+    const updated = { id: 5 };
+    const http = makeHttpClient({ patch: jest.fn().mockResolvedValue(updated) });
+    const gateway = new PartRepositoryGatewayApi(http);
+
+    const data = { description: 'Peça atualizada', location: 'PCU' as const };
+    const result = await gateway.update('ent-1', 5, data);
+
+    expect(http.patch).toHaveBeenCalledWith('/parts/5', data, { headers: authHeader() });
+    expect(result).toBe(updated);
+  });
+});

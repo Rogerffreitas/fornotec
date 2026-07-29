@@ -1,5 +1,5 @@
 import { PartRepositoryGateway } from '../../domain/application/gateway/PartRepositoryGateway';
-import { Part, NewPart } from '../../domain/entities/Part';
+import { Part, NewPart, PartUpdate } from '../../domain/entities/Part';
 import { HttpClient, HttpError } from '../../domain/application/infra/HttpClient';
 import { authHeader } from '../security/session';
 
@@ -26,5 +26,9 @@ export class PartRepositoryGatewayApi implements PartRepositoryGateway {
 
   async create(_enterpriseId: string, data: NewPart): Promise<Part> {
     return this.http.post<Part>('/parts', data, { headers: authHeader() });
+  }
+
+  async update(_enterpriseId: string, id: number, data: PartUpdate): Promise<Part> {
+    return this.http.patch<Part>(`/parts/${id}`, data, { headers: authHeader() });
   }
 }

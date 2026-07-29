@@ -30,6 +30,7 @@ export default function Pecas() {
           <ListRow
             titulo={`${item.reference} · ${item.description}`}
             subtitulo={findLocation(item.location).description}
+            onPress={() => router.push(`/pecas/${item.id}`)}
           />
         )}
       />

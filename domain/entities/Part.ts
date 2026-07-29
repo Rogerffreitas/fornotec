@@ -12,6 +12,8 @@ export interface Part {
 
 export type NewPart = Omit<Part, 'id' | 'enterpriseId' | 'reference'>;
 
+export type PartUpdate = NewPart;
+
 export const PART_FIELD_MAX_LENGTH = 100;
 
 /** Regra de negócio de geração da referência da peça. */

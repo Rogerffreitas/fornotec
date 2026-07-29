@@ -1,5 +1,5 @@
 import { PartRepositoryGateway } from '../../domain/application/gateway/PartRepositoryGateway';
-import { Part, NewPart, generatePartReference } from '../../domain/entities/Part';
+import { Part, NewPart, PartUpdate, generatePartReference } from '../../domain/entities/Part';
 import { parts } from './seed';
 import { delay, nextId } from './utils';
 
@@ -20,6 +20,13 @@ export class PartRepositoryGatewayImpl implements PartRepositoryGateway {
     const id = nextId(parts);
     const part: Part = { id, enterpriseId, ...data, reference: generatePartReference(data.location, id) };
     parts.push(part);
+    return delay(part);
+  }
+
+  async update(enterpriseId: string, id: number, data: PartUpdate): Promise<Part> {
+    const part = parts.find((p) => p.id === id && p.enterpriseId === enterpriseId);
+    if (!part) throw new Error(`Peça ${id} não encontrada`);
+    Object.assign(part, data, { reference: generatePartReference(data.location, id) });
     return delay(part);
   }
 }
